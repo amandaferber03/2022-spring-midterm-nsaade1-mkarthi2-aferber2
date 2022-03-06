@@ -132,13 +132,56 @@ Image *ReadPPM( FILE *fp )
 	return img;
 }
 
-
+char r = 'r'; 
 
 /* Write given image to disk as a PPM.
 * Return -1 if any failure occurs, otherwise return the number of pixels written.
 */
 int WritePPM( FILE *fp , const Image *img )
 {
-	// TODO: IMPLEMENT THIS FUNCTION
-	return -1;
+
+  if (fp == NULL) {
+    printf("Error: Unable to open file");
+    return -1;
+  }
+
+  const char  PPM_identifier[] = "P6";
+  const char newline = '\n';
+  const char whitespace = ' ';
+  const unsigned int width = img->width;
+  printf("Width: %u\n", width);
+  const unsigned int height = img->height;
+  printf("Height: %u\n", height);
+  const unsigned int colors = 255;
+  int pixel_count = 0;
+  
+  fprintf(fp, "%s\n", PPM_identifier);
+  fprintf(fp, "%u %u\n%u\n", width, height, colors);
+
+  //fwrite(&PPM_identifier, sizeof(char), 1, fp);
+  //fwrite(&newline, sizeof(char), 1, fp);
+  //fwrite(&width, sizeof(unsigned int), 1, fp);
+  //fwrite(&whitespace, sizeof(char), 1, fp);
+  //fwrite(&height, sizeof(unsigned int), 1, fp);
+  //fwrite(&newline, sizeof(char), 1, fp);
+  //fwrite(&colors, sizeof(int), 1, fp);
+  //fwrite(&newline, sizeof(char), 1, fp);
+
+  for (int i = 0; i < width; i++) {
+    for (int j = 0; j < height; j++) {
+       Pixel * pixels = img->pixels;
+       int position = (j * width) + i;
+       unsigned int red = (pixels[position]).r;
+       unsigned int green = (pixels[position]).g;
+       unsigned int blue = (pixels[position]).b;
+       pixel_count++;
+       unsigned int tmp[3]= {red, green, blue};
+
+       fwrite(tmp, sizeof(tmp[0]), 3, fp);
+       //fwrite(&green, sizeof(int), 1, fp);
+       //fwrite(&blue, sizeof(int), 1, fp); 
+    }
+  }
+ 
+  return pixel_count;
 }

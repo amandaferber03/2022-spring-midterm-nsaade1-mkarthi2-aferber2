@@ -11,6 +11,25 @@ int main( int argc , char *argv[] )
 {
 	// Seed the random number generator so that the code produces the same results on the same input.
 	srand(0);
+        FILE *fp = fopen(argv[1], "r");
+
+	if (fp == NULL) {
+	  printf("Error: Unable to read file");
+	  return 2;
+	}
+	
+	Image * img = ReadPPM(fp);
+
+	printf("Width: %u\n", (*img).width);
+	
+	FILE *fp_write = fopen(argv[2], "w+");
+
+	if (fp_write == NULL) {
+	  printf("Error: Unable to write file");
+	  return 4;
+	}
+	
+	int pixel_count = WritePPM(fp_write, img);
 
 	// Get the time at the start of execution
 	clock_t start_clock = clock();
