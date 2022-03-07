@@ -51,4 +51,5 @@ void FreeImage( Image **image )
 {
   free((*image)->pixels);
   free(*image);
+  *image = NULL;
 }

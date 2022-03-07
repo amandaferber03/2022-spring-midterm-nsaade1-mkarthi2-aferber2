@@ -10,6 +10,7 @@
 int main( int argc , char *argv[] )
 {
 	// Seed the random number generator so that the code produces the same results on the same input.
+        Image * img = NULL;
 	srand(0);
         FILE *fp = fopen(argv[1], "r");
 
@@ -18,7 +19,15 @@ int main( int argc , char *argv[] )
 	  return 2;
 	}
 	
-	Image * img = ReadPPM(fp);
+	img = ReadPPM(fp);
+
+	if(!img) {
+	  fclose(fp);
+	  printf("Error: could not read file");
+	  return 3;
+	}
+
+	
 
 	//for(int i = 0; i < (width * height); i++) {
 	//Pixel * pixels = img->pixels;//assigning to an array of Pixel structs img->pixels                                      

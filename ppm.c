@@ -149,9 +149,9 @@ int WritePPM( FILE *fp , const Image *img )
   const char newline = '\n';
   const char whitespace = ' ';
   const unsigned int width = img->width;
-  printf("Width: %u\n", width);
+  //printf("Width: %u\n", width);
   const unsigned int height = img->height;
-  printf("Height: %u\n", height);
+  //printf("Height: %u\n", height);
   const unsigned int colors = 255;
   int pixel_count = 0;
   
