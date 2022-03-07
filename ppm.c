@@ -167,21 +167,33 @@ int WritePPM( FILE *fp , const Image *img )
   //fwrite(&colors, sizeof(int), 1, fp);
   //fwrite(&newline, sizeof(char), 1, fp);
 
-  for (int i = 0; i < width; i++) {
-    for (int j = 0; j < height; j++) {
-       Pixel * pixels = img->pixels;
-       int position = (j * width) + i;
-       unsigned int red = (pixels[position]).r;
-       unsigned int green = (pixels[position]).g;
-       unsigned int blue = (pixels[position]).b;
-       pixel_count++;
-       unsigned int tmp[3]= {red, green, blue};
-
-       fwrite(tmp, sizeof(tmp[0]), 3, fp);
+  for(int i = 0; i < (width * height); i++) {
+    Pixel * pixels = img->pixels;//assigning to an array of Pixel structs img->pixels
+    unsigned char red = (pixels[i]).r;
+    unsigned char  green = (pixels[i]).g;
+    unsigned char blue = (pixels[i]).b;
+    //printf("%u %u %u/n", red, green, blue);
+    pixel_count++;
+    unsigned char tmp[3]= {red, green, blue};
+    fwrite(tmp, sizeof(tmp[0]), 3, fp);
+  }
+    
+  
+  //for (int i = 0; i < width; i++) {
+  //for (int j = 0; j < height; j++) {
+  //   Pixel * pixels = img->pixels;
+  //   int position = (j * width) + i;
+  //   unsigned int red = (pixels[position]).r;
+  //   unsigned int green = (pixels[position]).g;
+  //   unsigned int blue = (pixels[position]).b;
+  //   pixel_count++;
+  //   unsigned int tmp[3]= {red, green, blue};
+  
+  //     fwrite(tmp, sizeof(tmp[0]), 3, fp);
        //fwrite(&green, sizeof(int), 1, fp);
        //fwrite(&blue, sizeof(int), 1, fp); 
-    }
-  }
+  //}
+  //}
  
   return pixel_count;
 }

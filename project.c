@@ -20,7 +20,13 @@ int main( int argc , char *argv[] )
 	
 	Image * img = ReadPPM(fp);
 
-	printf("Width: %u\n", (*img).width);
+	//for(int i = 0; i < (width * height); i++) {
+	//Pixel * pixels = img->pixels;//assigning to an array of Pixel structs img->pixels                                      
+	//unsigned int red = (pixels[i]).r;
+	//unsigned int green = (pixels[i]).g;
+	//unsigned int blue = (pixels[i]).b;
+          //printf("%u %u %u/n", red, green, blue);
+	//}
 	
 	FILE *fp_write = fopen(argv[2], "w+");
 
