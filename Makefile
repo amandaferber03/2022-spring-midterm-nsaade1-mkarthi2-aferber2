@@ -11,12 +11,12 @@ project: project.o image.o ppm.o texture_synthesis.o
 	$(CC) -o project project.o image.o ppm.o texture_synthesis.o -lz
 
 # Links together files needed to create ppm executable                    
-ppm: ppm.o project.o image.o
-	$(CC) -o ppm ppm.o project.o image.o -lz
+ppm: ppm.o project.o image.o texture_synthesis.o
+	$(CC) -o ppm ppm.o project.o image.o texture_synthesis.o -lz
 
 # Links together files needed to create image executable
-image: image.o project.o ppm.o
-	$(CC) -o image image.o project.o ppm.o -lz
+image: image.o project.o ppm.o texture_synthesis.o
+	$(CC) -o image image.o project.o ppm.o texture_synthesis.o -lz
                                                                              
 # Links together files needed to create texture_synthesis executable
 texture_synthesis: texture_synthesis.o image.o project.o ppm.o

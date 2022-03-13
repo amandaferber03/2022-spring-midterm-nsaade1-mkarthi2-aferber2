@@ -38,8 +38,9 @@ int main( int argc , char *argv[] )
 
 
 	Image * new_image = NULL;
-	int width = argv[3];
-	int height = argv[4]; 
+	int width = atoi(argv[3]);
+	int height = atoi(argv[4]);
+	printf("main width and height: %d %d", width, height);
 	new_image = placeImage(width, height, img);
 
 	if(!new_image) {

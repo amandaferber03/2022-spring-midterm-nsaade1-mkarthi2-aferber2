@@ -23,8 +23,10 @@ Image * placeImage(int width, int height, const Image * image) {
 
   Pixel * pixels = img->pixels;
   Pixel * exemplar_pixels = image->pixels;
+  int count = 0;
+  int counter = 0; 
   
-  for (int i = 0; i < height; i++) {
+  /*for (int i = 0; i < height; i++) {
     for (int j = 0; j < width; j++) {
       int position = (width * i) + j; 
       if (i <= 50 && j <= 66) {
@@ -40,7 +42,7 @@ Image * placeImage(int width, int height, const Image * image) {
 		(pixels[position]).a = 0;
       }
     }
-  } 
+  } */
 
 //printf("Hey\n");
   
@@ -50,7 +52,7 @@ Image * placeImage(int width, int height, const Image * image) {
 	  //printf("Hey1\n");
 	  if ((i / width) % (height-1) < img->height) { //Evaluating we are in an applicable row
 		  if ((i % (width - 1) <= img->width) ) { //Evaluating if we are in an applicable column
-			(pixels[i]).r = (exemplar_pixels[i/]).r;
+			(pixels[i]).r = (exemplar_pixels[i]).r;
 			(pixels[i]).g = (exemplar_pixels[i]).g;
 			(pixels[i]).b = (exemplar_pixels[i]).b;
 			(pixels[i]).a = 255;
@@ -68,6 +70,28 @@ Image * placeImage(int width, int height, const Image * image) {
 		//printf("Hey3\n");
 	  }
   } */
+
+  for(int i = 0; i < width * height; i++) {
+	  if(i >= (count*width) && i <= (count*width + image->width -1) && !(count >= image->height)) {
+		  int exemp_pos = i - count*(((count+1)*(width) -1) - ((count)*(width) + image->width -1));
+		  (pixels[i]).r = (exemplar_pixels[exemp_pos]).r;
+		  (pixels[i]).g = (exemplar_pixels[exemp_pos]).g;
+		  (pixels[i]).b = (exemplar_pixels[exemp_pos]).b;
+		  (pixels[i]).a = 255;
+		  
+	  }
+	  else {
+		(pixels[i]).r = 0;
+        (pixels[i]).g = 0;
+        (pixels[i]).b = 0;
+		(pixels[i]).a = 0;
+	  }
+	  counter++;
+	  if (counter % width == 0) {
+		  count++;
+	  }
+
+  }
   return img;
   
     
