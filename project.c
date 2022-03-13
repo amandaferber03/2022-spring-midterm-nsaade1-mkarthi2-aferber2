@@ -9,7 +9,14 @@
 
 int main( int argc , char *argv[] )
 {
+	//Chech number of command line arguments
+	if (argc != 6) {
+		printf("Error: not enough arguments provided");
+		return 1;
+	}
+
 	// Seed the random number generator so that the code produces the same results on the same input.
+
         Image * img = NULL;
 	srand(0);
         FILE *fp = fopen(argv[1], "r");
@@ -21,10 +28,23 @@ int main( int argc , char *argv[] )
 	
 	img = ReadPPM(fp);
 
+	fclose(fp);
+
 	if(!img) {
-	  fclose(fp);
+	  //fclose(fp);
 	  printf("Error: could not read file");
 	  return 3;
+	}
+
+
+	Image * new_image = NULL;
+	int width = argv[3];
+	int height = argv[4]; 
+	new_image = placeImage(width, height, img);
+
+	if(!new_image) {
+		printf("Error: dimensions of exemplar exceed those of new image");
+		return 1;
 	}
 
 	
@@ -44,7 +64,8 @@ int main( int argc , char *argv[] )
 	  return 4;
 	}
 	
-	int pixel_count = WritePPM(fp_write, img);
+	int pixel_count = WritePPM(fp_write, new_image);
+	fclose(fp_write);
 
 	// Get the time at the start of execution
 	clock_t start_clock = clock();
