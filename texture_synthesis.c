@@ -8,35 +8,68 @@
 #include "texture_synthesis.h"
 
 Image * placeImage(int width, int height, const Image * image) {
-  if ((width > image->width) || (height > image->height)) {
+  if ((width < image->width) || (height < image->height)) {
     return NULL;
   }
-  Image * img;
+  
+  Image * img = (Image *) malloc(sizeof(Image));
+  
   img->width = width;
+  
   img->height = height;
 
-  img.pixels = (*Pixel) malloc(sizeof(Pixel) * width * height);
+  
+  img->pixels = (Pixel *) malloc(sizeof(Pixel) * width * height);
 
-  for (int i = 0; i < width; i++) {
-    for (int j = 0; j < height; j++) {
-      Pixel * pixels = img->pixels;
-      Pixel * exemplar_pixels = image->pixels;
-      int position = (width * j) + i; 
-      if (i <= image->width && j <= image->height) {
-	pixels[position].r = exemplar_pixels[position].r;
-	pixels[position].g = exemplar_pixels[position].g;
-	pixels[position].b = exemplar_pixels[position].b;
-	pixels[position].a = 255;
+  Pixel * pixels = img->pixels;
+  Pixel * exemplar_pixels = image->pixels;
+  
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
+      int position = (width * i) + j; 
+      if (i <= 50 && j <= 66) {
+		(pixels[position]).r = (exemplar_pixels[position]).r;
+		(pixels[position]).g = (exemplar_pixels[position]).g;
+		(pixels[position]).b = (exemplar_pixels[position]).b;
+		(pixels[position]).a = 255;
       }
       else {
-	pixels[position].r = 0;
-        pixels[position].g = 0;
-        pixels[position].b = 0;
-	pixels[position].a = 0;
+		(pixels[position]).r = 0;
+        (pixels[position]).g = 0;
+        (pixels[position]).b = 0;
+		(pixels[position]).a = 0;
       }
     }
-  }
+  } 
+
+//printf("Hey\n");
+  
+  /*for (int i = 0; i < (img->width * img->height); i++) {
+	  Pixel * pixels = img->pixels;
+      Pixel * exemplar_pixels = image->pixels;
+	  //printf("Hey1\n");
+	  if ((i / width) % (height-1) < img->height) { //Evaluating we are in an applicable row
+		  if ((i % (width - 1) <= img->width) ) { //Evaluating if we are in an applicable column
+			(pixels[i]).r = (exemplar_pixels[i/]).r;
+			(pixels[i]).g = (exemplar_pixels[i]).g;
+			(pixels[i]).b = (exemplar_pixels[i]).b;
+			(pixels[i]).a = 255;
+		  }
+		  //printf("Hey2\n");
+		  //printf("%d %d %d", width, height, width * height);
+		  //printf("%d\n", i);
+	  }
+	  
+	  else {
+		(pixels[i]).r = 0;
+        (pixels[i]).g = 0;
+        (pixels[i]).b = 0;
+		(pixels[i]).a = 0;
+		//printf("Hey3\n");
+	  }
+  } */
   return img;
+  
     
 }
 // compares tbs pixels 
