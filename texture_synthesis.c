@@ -7,6 +7,38 @@
 #include <assert.h>
 #include "texture_synthesis.h"
 
+Image * placeImage(int width, int height, const Image * image) {
+  if ((width > image->width) || (height > image->height)) {
+    return NULL;
+  }
+  Image * img;
+  img->width = width;
+  img->height = height;
+
+  img.pixels = (*Pixel) malloc(sizeof(Pixel) * width * height);
+
+  for (int i = 0; i < width; i++) {
+    for (int j = 0; j < height; j++) {
+      Pixel * pixels = img->pixels;
+      Pixel * exemplar_pixels = image->pixels;
+      int position = (width * j) + i; 
+      if (i <= image->width && j <= image->height) {
+	pixels[position].r = exemplar_pixels[position].r;
+	pixels[position].g = exemplar_pixels[position].g;
+	pixels[position].b = exemplar_pixels[position].b;
+	pixels[position].a = 255;
+      }
+      else {
+	pixels[position].r = 0;
+        pixels[position].g = 0;
+        pixels[position].b = 0;
+	pixels[position].a = 0;
+      }
+    }
+  }
+  return img;
+    
+}
 // compares tbs pixels 
 int CompareTBSPixels( const void *v1 , const void *v2 )
 {

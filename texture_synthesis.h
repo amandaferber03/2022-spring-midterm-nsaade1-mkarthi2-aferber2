@@ -15,6 +15,9 @@ typedef struct
 	unsigned int r;
 } TBSPixel;
 
+
+/**This is a function that copies the examplar image and places it in top-left corner of a new image with dimensions that the user specifies */
+Image * placeImage(int width, int height, const Image * image) ;
 /** A function that compares two TBSPixels and returns a negative number if the first should come earlier in the sort order and a positive number if it should come later*/
 int CompareTBSPixels( const void *v1 , const void *v2 );
 
