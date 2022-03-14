@@ -26,7 +26,7 @@ TBSPixel * count_neighbors(Image * img, const Image * exemplar) {
 
 		// finding neighbor counts of unset pixels
 		if (pixel[i].a == 0) {
-			if ((i + width) > (width * height)) { // BOTTOM-MOST PIXELS
+			if ((i + width) >= (width * height)) { // BOTTOM-MOST PIXELS
 				if ((i + 1) == (width * height)) { // BOTTOM RIGHT
 					if (pixel[i - width].a == 255) { // up
 						tbs_neighbor_tracker++;
@@ -162,16 +162,17 @@ TBSPixel * count_neighbors(Image * img, const Image * exemplar) {
 			// setting idx and neighborCount fields
 			tbs_pixels[tbs_counter].idx.x = unset_pixel_x;
 			tbs_pixels[tbs_counter].idx.y = unset_pixel_y;
+			tbs_pixels[tbs_counter].neighborCount = tbs_neighbor_tracker;
 
 			// next index in TBS pixel array
 			tbs_counter++;
-
+			tbs_neighbor_tracker = 0;
 		}
 
 	} // for
 
 
-	
+
 	return tbs_pixels;
 }
 
