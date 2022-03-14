@@ -9,13 +9,17 @@
 
 int main( int argc , char *argv[] )
 {
+	#if 1 
 	printf("first");
+	
+	
 	// Check number of command line arguments
 	if (argc != 6) {
 		printf("Error: not enough arguments provided");
 		return 1;
 	}
-
+	printf("second\n");
+	
 	// Seed the random number generator so that the code produces the same results on the same input.
     Image * img = NULL;
 	srand(0);
@@ -29,7 +33,8 @@ int main( int argc , char *argv[] )
 	img = ReadPPM(fp);
 
 	fclose(fp);
-
+	printf("third\n");
+	
 	if(!img) {
 	  //fclose(fp);
 	  printf("Error: could not read file");
@@ -42,7 +47,8 @@ int main( int argc , char *argv[] )
 	int window_radius = atoi(argv[5]);
 	printf("main width and height: %d %d", width, height);
 	new_image = place_image(width, height, img);
-
+	printf("\nfourth\n");
+	
 	if(!new_image) {
 		printf("Error: dimensions of exemplar exceed those of new image");
 		return 1;
@@ -54,10 +60,15 @@ int main( int argc , char *argv[] )
 	  printf("Error: Unable to write file");
 	  return 4;
 	}
-
+	printf("\nfifth\n");
+	
 	int pixel_count = WritePPM(fp_write, new_image);
+	printf("\nsixth\n");
+	#else
 	new_image = SynthesizeFromExemplar(img, width, height, window_radius);
 	fclose(fp_write);
+
+	
 
 	// Get the time at the start of execution
 	clock_t start_clock = clock();
@@ -69,6 +80,7 @@ int main( int argc , char *argv[] )
 
 	// Convert the time difference into seconds and print
 	printf( "Synthesized texture in %.2f(s)\n" , (double)clock_difference/CLOCKS_PER_SEC );
+	#endif
 	return 0;
 }
 
