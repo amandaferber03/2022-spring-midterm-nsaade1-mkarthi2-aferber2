@@ -9,17 +9,16 @@
 
 int main( int argc , char *argv[] )
 {
-	//Chech number of command line arguments
+	// Check number of command line arguments
 	if (argc != 6) {
 		printf("Error: not enough arguments provided");
 		return 1;
 	}
 
 	// Seed the random number generator so that the code produces the same results on the same input.
-
-        Image * img = NULL;
+    Image * img = NULL;
 	srand(0);
-        FILE *fp = fopen(argv[1], "r");
+    FILE *fp = fopen(argv[1], "r");
 
 	if (fp == NULL) {
 	  printf("Error: Unable to read file");
@@ -36,27 +35,17 @@ int main( int argc , char *argv[] )
 	  return 3;
 	}
 
-
 	Image * new_image = NULL;
 	int width = atoi(argv[3]);
 	int height = atoi(argv[4]);
+	int window_radius = atoi(argv[5]);
 	printf("main width and height: %d %d", width, height);
-	new_image = placeImage(width, height, img);
+	new_image = place_image(width, height, img);
 
 	if(!new_image) {
 		printf("Error: dimensions of exemplar exceed those of new image");
 		return 1;
 	}
-
-	
-
-	//for(int i = 0; i < (width * height); i++) {
-	//Pixel * pixels = img->pixels;//assigning to an array of Pixel structs img->pixels                                      
-	//unsigned int red = (pixels[i]).r;
-	//unsigned int green = (pixels[i]).g;
-	//unsigned int blue = (pixels[i]).b;
-          //printf("%u %u %u/n", red, green, blue);
-	//}
 	
 	FILE *fp_write = fopen(argv[2], "w+");
 
@@ -64,8 +53,9 @@ int main( int argc , char *argv[] )
 	  printf("Error: Unable to write file");
 	  return 4;
 	}
-	
+
 	int pixel_count = WritePPM(fp_write, new_image);
+	new_image = SynthesizeFromExemplar(img, width, height, window_radius);
 	fclose(fp_write);
 
 	// Get the time at the start of execution
