@@ -9,6 +9,7 @@
 
 int main( int argc , char *argv[] )
 {
+	printf("first");
 	// Check number of command line arguments
 	if (argc != 6) {
 		printf("Error: not enough arguments provided");

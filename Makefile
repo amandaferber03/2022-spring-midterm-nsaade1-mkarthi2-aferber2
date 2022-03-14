@@ -1,7 +1,7 @@
 # Makefile                                                                    
 
 CC=gcc
-CFLAGS=-std=c99 -pedantic -Wall -Wextra
+CFLAGS=-std=c99 -pedantic -Wall -Wextra -g
 
 # Links all of the executables together                                      
 all: project image ppm texture_synthesis

@@ -26,9 +26,9 @@ TBSPixel * count_neighbors(Image * img, const Image * exemplar) {
 
 		// finding neighbor counts of unset pixels
 		if (pixel[i].a == 0) {
-			if ((i+width) >= (width * height)) { // BOTTOM-MOST PIXELS
-				if ((i+1) == (width * height)) { // BOTTOM RIGHT
-					if (pixel[i-width].a == 255) { // up
+			if ((i + width) > (width * height)) { // BOTTOM-MOST PIXELS
+				if ((i + 1) == (width * height)) { // BOTTOM RIGHT
+					if (pixel[i - width].a == 255) { // up
 						tbs_neighbor_tracker++;
 					}
 					if (pixel[i - width - 1].a == 255) { // top-left
@@ -47,7 +47,6 @@ TBSPixel * count_neighbors(Image * img, const Image * exemplar) {
 					}
 					if (pixel[i + 1].a == 255) { // right
 						tbs_neighbor_tracker++;
-					}
 					}
 				}
 				else { // BOTTOM
@@ -160,13 +159,19 @@ TBSPixel * count_neighbors(Image * img, const Image * exemplar) {
 				}
 			}
 
-		// setting idx and neighborCount fields
-		tbs_pixels[tbs_counter].idx.x = unset_pixel_x;
-		tbs_pixels[tbs_counter].idx.y = unset_pixel_y;
+			// setting idx and neighborCount fields
+			tbs_pixels[tbs_counter].idx.x = unset_pixel_x;
+			tbs_pixels[tbs_counter].idx.y = unset_pixel_y;
 
-		// next index in TBS pixel array
-		tbs_counter++;
-	}
+			// next index in TBS pixel array
+			tbs_counter++;
+
+		}
+
+	} // for
+
+
+	
 	return tbs_pixels;
 }
 
