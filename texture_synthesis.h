@@ -32,13 +32,14 @@ int SortTBSPixels( TBSPixel *tbsPixels , unsigned int sz );
 Image *SynthesizeFromExemplar( const Image *exemplar , unsigned int outWidth , unsigned int outHeight , unsigned int windowRadius); // bool verbose );
 
 /** Counter functions for different pixels **/
-void set_neighboring_pixels_bottom_right(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
-void set_neighboring_pixels_bottom(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
-void set_neighboring_pixels_bottom_left(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
-void set_neighboring_pixels_top_right(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
-void set_neighboring_pixels_center(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
-void set_neighboring_pixels_right(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
-void set_neighboring_pixels_left(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
-void set_neighboring_pixels_top(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
+int determine_position(int i, unsigned int width, unsigned int height);
+void count_for_top(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_bottom_right(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_bottom_left(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_bottom(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_top_right(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_right(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_left(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_other(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
 
 #endif // TEXTURE_SYNTHESIS_INCLUDED
