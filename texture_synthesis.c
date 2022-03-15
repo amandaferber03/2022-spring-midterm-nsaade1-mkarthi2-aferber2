@@ -7,31 +7,95 @@
 #include <assert.h>
 #include "texture_synthesis.h"
 
-/*
-int determine_position(int i, unsigned int width, unsigned int height);
-void count_for_top(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
-void count_for_bottom_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
-void count_for_bottom_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
-void count_for_bottom(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
-void count_for_top_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
-void count_for_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
-void count_for_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
-void count_for_other(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
-*/
+Pixel * create_TBS_pixel_window(int r, TBSPixel * TBSPixel, Pixel * pixels, int width, int height) {
+	int window_width = 2 * r + 1;
+	int window_height = 2 * r + 1;
 
-/*
-void create_TBS_pixel_window(int r, TBSPixel * TBSPixel) {
-	int width = 2 * r + 1;
-	int height = 2 * r + 1;
+	Pixel * pixel_window = (Pixel *) malloc(sizeof(Pixel) * window_width * window_height);
+	int x = TBSPixel.idx.x;
+	int y = TBSPixel.idx.y;
 
+	int counter = 0;
+
+	int x_top_left = x - r;
+	int y_top_left = y - r;
+
+	for(int i = x_top_left; i <= (x + r); i++) {
+	  for(int j = y_top_left; j <= (y + r); j++) {
+	    if (!(i <= 0 && i >= width) || !(j <= 0 && j >= height)) {
+	      Pixel pixel_out_bounds = {0, 0, 0, 0};
+	      pixel_window[counter] = pixel_out_bounds;
+	      counter++;
+	    }
+	    int position = (width * j) + i;
+	    pixel_window[counter] = pixels[i];
+            counter++;
+	  }
+	}
+	      
+	return pixel_window;
+
+}
+
+
+Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * pixels) { //to be used in a for loop iterating through the exemplar image pixels
+
+	int window_width = 2 * r + 1;
+        int window_height = 2 * r + 1;
+
+        Pixel * pixel_window = (Pixel *) malloc(sizeof(Pixel) * window_width * window_height);
+
+	int exemp_x  = index  % width;
+        int exemp_y  = index / width;
+
+	int counter = 0;
+
+	int x_top_left = x - r;
+        int y_top_left = y - r;
+
+        for(int i = x_top_left; i <= (exemp_x + r); i++) {
+          for(int j = y_top_left; j <= (exemp_y + r); j++) {
+            if (!(i <= 0 && i >= width) || !(j <= 0 && j >= height)) {
+              Pixel pixel_out_bounds = {0, 0, 0, 0};
+              pixel_window[counter] = pixel_out_bounds;
+                counter++;
+            }
+            int position = (width * j) + i;
+            pixel_window[counter] = pixels[i];
+            counter++;
+          }
+        }
+
+        return pixel_window;
+}
 	
 
+
+void compare_windows(TBSPixel * tbs_pixels, Image * img, Image * exemp, int r, int TBSPixel_arr_size) {
+  //what should compare_windows return
+  Pixel * pixels_array = img->pixels;
+  int width = img->width;
+  int height = img->height;
+  int exemp_width = exemp->width;
+  int exemp_height = exemp->height;
+  int exemp_count = 0;
+  int exemp_counter = 0;
+
+  
+  for (int i = 0; i < TBSPixel_arr_size; i++) {
+    Pixel * tbs_pixel_window = create_TBS_pixel_window(r, tbs_pixels[i], pixels_array, width, height);
+    for(int j = 0; j < width * height; j++) {
+      if(j >= (exemp_count*width) && j <= (exemp_count*width + exemp_width -1) && !(exemp_count >= exemp_height)) {
+	  exemp_counter++;
+          if (exemp_counter % width == 0) {
+             exemp_count++;
+          }
+	  Pixel * exemp_pixel_window = create_exemplar_window(r, j, width, pixels_array);
+	  //TO DO - implement helper function to do comparison between corresponding pixels in both windows
+      }
+    }
+  }
 }
-void create_exemplar_window(int r, Pixel * pixel) {
-	int width = 2 * r + 1;
-	int height = 2 * r + 1;
-}
-*/
 
 TBSPixel * count_neighbors(Image * new_img, const Image * exemplar) {
 
