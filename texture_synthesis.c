@@ -7,15 +7,17 @@
 #include <assert.h>
 #include "texture_synthesis.h"
 
+/*
 int determine_position(int i, unsigned int width, unsigned int height);
-void count_for_top(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
-void count_for_bottom_right(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
-void count_for_bottom_left(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
-void count_for_bottom(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
-void count_for_top_right(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
-void count_for_right(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
-void count_for_left(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
-void count_for_other(unsigned int i, Pixel * pixels, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_top(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_bottom_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_bottom_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_bottom(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_top_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
+void count_for_other(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
+*/
 
 TBSPixel * count_neighbors(Image * new_img, const Image * exemplar) {
 
@@ -77,20 +79,18 @@ TBSPixel * count_neighbors(Image * new_img, const Image * exemplar) {
 
 		}
 	}
+
+	return tbs_pixels;
 }
 
 int determine_position(int i, unsigned int width, unsigned int height) {
-	// TOP
-	if (i < width) {
-		return 0;
-	}
-	else if (i + width >= width * height) {
+	if (i + width >= width * height) {
 		// BOTTOM RIGHT
 		if (i + 1 == width * height) {
 			return 1;
 		}
 		// BOTTOM LEFT
-		else if (i == width * height - (width - 1)) {
+		else if (i == width * height - width) {
 			return 2;
 		}
 		// BOTTOM
@@ -108,6 +108,10 @@ int determine_position(int i, unsigned int width, unsigned int height) {
 			return 5;
 		}
 	}
+	else if (i < width) {
+		// TOP
+		return 0;
+	}
 	else if (i % width == 0) {
 		// LEFT
 		return 6;
@@ -120,136 +124,136 @@ int determine_position(int i, unsigned int width, unsigned int height) {
 
 void count_for_top(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	if (pixel[i - 1].a == 255) { // left pixel
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + 1].a == 255) { // right
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + width].a == 255) { // bottom
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + width - 1].a == 255) { // bottom left
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + width + 1].a == 255) { // bottom right
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 }
 
 void count_for_bottom_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	if (pixel[i - width].a == 255) { // top pixel
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i - width - 1].a == 255) { // top left
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i - 1].a == 255) { // left
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 }
 
 void count_for_bottom_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	if (pixel[i - width].a == 255) { // top pixel
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i - width + 1].a == 255) { // top right
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + 1].a == 255) { // right
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 }
 
 void count_for_bottom(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	if (pixel[i - width].a == 255) { // top
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i - width + 1].a == 255) { // top right
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i - width - 1].a == 255) { // top left
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i - 1].a == 255) { // left
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + 1].a == 255) { // right
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 }
 
 void count_for_top_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	if (pixel[i - 1].a == 255) { // left pixel
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + width].a == 255) { // bottom
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + width - 1].a == 255) { // bottom left
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 }
 
 void count_for_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	if (pixel[i - width].a == 255) { // top pixel
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i - width - 1].a == 255) { // top left
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i - 1].a == 255) { // left
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + width].a == 255) { // bottom
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + width - 1].a == 255) { //bottom left
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 }
 
 void count_for_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	if (pixel[i - width].a == 255) { // top pixel
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i - width + 1].a == 255) { // top right
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + 1].a == 255) { // right
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + width].a == 255) { // bottom
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + width + 1].a == 255) { // bottom right
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 }
 
 void count_for_other(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	if (pixel[i - width].a == 255) { // top pixel
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i - width + 1].a == 255) { // top right
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i - width - 1].a == 255) { //top left
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i - 1].a == 255) { // left
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + 1].a == 255) { // right
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + width].a == 255) { // bottom
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + width - 1].a == 255) { // bottom left
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 	if (pixel[i + width + 1].a == 255) { // bottom right
-		tbs_neighbor_tracker++;
+		(*tbs_neighbor_tracker)++;
 	}
 }
 
@@ -279,7 +283,7 @@ Image * place_image(int width, int height, const Image * image) {
 		  
 	  }
 	  else {
-		(pixels[i]).r = 0;
+	    (pixels[i]).r = 0;
         (pixels[i]).g = 0;
         (pixels[i]).b = 0;
 		(pixels[i]).a = 0;
@@ -339,35 +343,41 @@ int SortTBSPixels( TBSPixel *tbsPixels , unsigned int sz )
 
 Image *SynthesizeFromExemplar( const Image *exemplar , unsigned int outWidth , unsigned int outHeight , unsigned int windowRadius) // bool verbose 
 {
-	printf("Hello");
 	Image * new_image = place_image(outWidth, outHeight, exemplar);
-	printf("Hello");
 	TBSPixel * neighbor_counts = count_neighbors(new_image, exemplar);
 	
 	// SortTBSPixels successful
 	int exemplar_pixels = exemplar->width * exemplar->height;
 	int new_pixels = new_image->width * new_image->height;
-	int TBSPixel_arr_size = new_pixels - exemplar_pixels;
+	unsigned int TBSPixel_arr_size = new_pixels - exemplar_pixels;
 
-	
 	/*
-	for (int i = 0; i < TBSPixel_arr_size; i++) {
+	for (int i = 0; i < (new_image->width - 2) + (new_image->height - 2); i++) {
 		int x = neighbor_counts[i].neighborCount;
 		printf("%d\n", x);
 	}
 	*/
 	
-
-	/*
-	printf("Hello");
 	if (SortTBSPixels(neighbor_counts, TBSPixel_arr_size) == 0) {
 		printf("Success!\n");
 	}
 	else {
 		printf("Failure :(\n");
 	}
+
+	for (int i = 0; i <= ((exemplar->width) + (exemplar->height) + 1); i++) {
+		int nc = neighbor_counts[i].neighborCount;
+		int x = neighbor_counts[i].idx.x;
+		int y = neighbor_counts[i].idx.y;
+		printf("%d %d %d\n", nc, x, y);
+	}
+
+	/*
+	for (int i = 0; i < 10; i++) {
+		int x = neighbor_counts[i].neighborCount;
+		printf("%d\n", x);
+	}
 	*/
-	
 
 	// TODO: IMPLEMENT THIS FUNCTION
 	return new_image;
