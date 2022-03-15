@@ -20,7 +20,7 @@ typedef struct
 TBSPixel * count_neighbors(Image * new_image, const Image * exemplar_image);
 
 /**This is a function that copies the examplar image and places it in top-left corner of a new image with dimensions that the user specifies */
-Image * place_image(int width, int height, const Image * image);
+Image * place_image(unsigned int width, unsigned int height, const Image * image);
 
 /** A function that compares two TBSPixels and returns a negative number if the first should come earlier in the sort order and a positive number if it should come later*/
 int CompareTBSPixels( const void *v1 , const void *v2 );
@@ -32,7 +32,7 @@ int SortTBSPixels( TBSPixel *tbsPixels , unsigned int sz );
 Image *SynthesizeFromExemplar( const Image *exemplar , unsigned int outWidth , unsigned int outHeight , unsigned int windowRadius); // bool verbose );
 
 /** Counter functions for different pixels **/
-int determine_position(int i, unsigned int width, unsigned int height);
+int determine_position(unsigned int i, unsigned int width, unsigned int height);
 void count_for_top(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
 void count_for_bottom_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
 void count_for_bottom_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);

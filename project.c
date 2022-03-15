@@ -12,41 +12,45 @@ int main( int argc , char *argv[] )
 	#if 1 
 	printf("first");
 	
-	
 	// Check number of command line arguments
 	if (argc != 6) {
-		printf("Error: not enough arguments provided");
+		printf("Error: Not enough arguments provided\n");
 		return 1;
 	}
 	printf("second\n");
 	
 	// Seed the random number generator so that the code produces the same results on the same input.
-    Image * img = NULL;
 	srand(0);
     FILE *fp = fopen(argv[1], "r");
 
+	// Error reading the input file
 	if (fp == NULL) {
-	  printf("Error: Unable to read file");
+	  printf("Error: Unable to read file of the exemplar image\n");
 	  return 2;
 	}
 	
+	// Setting fields in the Image struct representing the exemplar image
+	Image * img = NULL;
 	img = ReadPPM(fp);
 
-	fclose(fp);
-	printf("third\n");
-	
-	if(!img) {
-	  //fclose(fp);
-	  printf("Error: could not read file");
+	// Error creating the Image struct
+	if(img == NULL) {
+	  printf("Error: Unable to create a struct for the exemplar image\n");
 	  return 3;
 	}
 
-	Image * new_image = NULL;
+	// Closing the input file
+	fclose(fp);
+	printf("third\n");
+	
+	// Storing the user inputted width, height, and window radius
 	int width = atoi(argv[3]);
 	int height = atoi(argv[4]);
 	int window_radius = atoi(argv[5]);
 	printf("main width and height: %d %d", width, height);
 
+	// Setting the fields of the struct representing the new image
+	Image * new_image = NULL;
 	new_image = SynthesizeFromExemplar(img, width, height, window_radius);
 	
 	//if(!new_image) {
