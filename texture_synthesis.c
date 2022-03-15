@@ -19,6 +19,18 @@ void count_for_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, u
 void count_for_other(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width);
 */
 
+void create_TBS_pixel_window(int r, TBSPixel * TBSPixel) {
+	int width = 2 * r + 1;
+	int height = 2 * r + 1;
+
+	
+
+}
+void create_exemplar_window(int r, Pixel * pixel) {
+	int width = 2 * r + 1;
+	int height = 2 * r + 1;
+}
+
 TBSPixel * count_neighbors(Image * new_img, const Image * exemplar) {
 
 	// determining the size of the TBSPixel array
