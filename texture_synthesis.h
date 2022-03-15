@@ -31,4 +31,14 @@ int SortTBSPixels( TBSPixel *tbsPixels , unsigned int sz );
 /** A function that extends the exemplar into an image with the specified dimensions, using the prescribed window radius -- the verbose argument is passed in to enable logging to the command prompt, if desired*/
 Image *SynthesizeFromExemplar( const Image *exemplar , unsigned int outWidth , unsigned int outHeight , unsigned int windowRadius); // bool verbose );
 
+/** Counter functions for different pixels **/
+void set_neighboring_pixels_bottom_right(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
+void set_neighboring_pixels_bottom(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
+void set_neighboring_pixels_bottom_left(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
+void set_neighboring_pixels_top_right(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
+void set_neighboring_pixels_center(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
+void set_neighboring_pixels_right(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
+void set_neighboring_pixels_left(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
+void set_neighboring_pixels_top(unsigned int i, int * tbs_neighbor_tracking, Pixel * pixel);
+
 #endif // TEXTURE_SYNTHESIS_INCLUDED
