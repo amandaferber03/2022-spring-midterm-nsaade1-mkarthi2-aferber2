@@ -46,27 +46,27 @@ int main( int argc , char *argv[] )
 	int height = atoi(argv[4]);
 	int window_radius = atoi(argv[5]);
 	printf("main width and height: %d %d", width, height);
-	new_image = place_image(width, height, img);
-	printf("\nfourth\n");
-	
-	if(!new_image) {
-		printf("Error: dimensions of exemplar exceed those of new image");
-		return 1;
-	}
-	
-	FILE *fp_write = fopen(argv[2], "w+");
 
-	if (fp_write == NULL) {
-	  printf("Error: Unable to write file");
-	  return 4;
-	}
+	new_image = SynthesizeFromExemplar(img, width, height, window_radius);
+	
+	//if(!new_image) {
+	//printf("Error: dimensions of exemplar exceed those of new image");
+	//return 1;
+	//}
+	
+	//FILE *fp_write = fopen(argv[2], "w+");
+
+	//if (fp_write == NULL) {
+	//printf("Error: Unable to write file");
+	//return 4;
+	//}
 	printf("\nfifth\n");
 	
-	int pixel_count = WritePPM(fp_write, new_image);
-	printf("\nsixth\n");
+	//int pixel_count = WritePPM(fp_write, new_image);
+	//printf("\nsixth\n");
 	#else
 	new_image = SynthesizeFromExemplar(img, width, height, window_radius);
-	fclose(fp_write);
+	//fclose(fp_write);
 
 	
 
