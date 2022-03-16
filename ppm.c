@@ -54,9 +54,8 @@ int ppm_read_num( FILE *fp )
 	}
 }
 
-
-
-
+/**Helper function to read ppm file
+   Return a resulting image*/
 Image *ReadPPM( FILE *fp )
 {
 	/* confirm that we received a good file handle */
@@ -158,15 +157,6 @@ int WritePPM( FILE *fp , const Image *img )
   fprintf(fp, "%s\n", PPM_identifier);
   fprintf(fp, "%u %u\n%u\n", width, height, colors);
 
-  //fwrite(&PPM_identifier, sizeof(char), 1, fp);
-  //fwrite(&newline, sizeof(char), 1, fp);
-  //fwrite(&width, sizeof(unsigned int), 1, fp);
-  //fwrite(&whitespace, sizeof(char), 1, fp);
-  //fwrite(&height, sizeof(unsigned int), 1, fp);
-  //fwrite(&newline, sizeof(char), 1, fp);
-  //fwrite(&colors, sizeof(int), 1, fp);
-  //fwrite(&newline, sizeof(char), 1, fp);
-
   for(int i = 0; i < (width * height); i++) {
     Pixel * pixels = img->pixels;//assigning to an array of Pixel structs img->pixels
     unsigned char red = (pixels[i]).r;
@@ -177,23 +167,6 @@ int WritePPM( FILE *fp , const Image *img )
     unsigned char tmp[3]= {red, green, blue};
     fwrite(tmp, sizeof(tmp[0]), 3, fp);
   }
-    
-  
-  //for (int i = 0; i < width; i++) {
-  //for (int j = 0; j < height; j++) {
-  //   Pixel * pixels = img->pixels;
-  //   int position = (j * width) + i;
-  //   unsigned int red = (pixels[position]).r;
-  //   unsigned int green = (pixels[position]).g;
-  //   unsigned int blue = (pixels[position]).b;
-  //   pixel_count++;
-  //   unsigned int tmp[3]= {red, green, blue};
-  
-  //     fwrite(tmp, sizeof(tmp[0]), 3, fp);
-       //fwrite(&green, sizeof(int), 1, fp);
-       //fwrite(&blue, sizeof(int), 1, fp); 
-  //}
-  //}
  
   return pixel_count;
 }
