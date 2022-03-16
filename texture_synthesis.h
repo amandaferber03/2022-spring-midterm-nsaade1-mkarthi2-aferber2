@@ -16,10 +16,10 @@ typedef struct
 } TBSPixel;
 
 /**This is a function that creates a window for TBS Pixels**/
-Pixel * create_TBS_pixel_window(int r, TBSPixel * TBSPixel, Pixel * pixels, int width, int height);
+Pixel * create_TBS_pixel_window(int r, TBSPixel TBSPixel, Pixel * pixels, int width, int height);
 
 /**This is a function that creates a window for Exemplar Pixels**/
-Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * pixels)
+Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * pixels);
 
 /**This function compares windows from TBS Pixels and the exemplar**/
 void compare_windows(TBSPixel * tbs_pixels, Image * img, Image * exemp, int r, int TBSPixel_arr_size); 

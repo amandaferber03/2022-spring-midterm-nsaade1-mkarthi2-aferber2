@@ -7,7 +7,7 @@
 #include <assert.h>
 #include "texture_synthesis.h"
 
-Pixel * create_TBS_pixel_window(int r, TBSPixel * TBSPixel, Pixel * pixels, int width, int height) {
+Pixel * create_TBS_pixel_window(int r, TBSPixel TBSPixel, Pixel * pixels, int width, int height) {
 	int window_width = 2 * r + 1;
 	int window_height = 2 * r + 1;
 
@@ -22,14 +22,17 @@ Pixel * create_TBS_pixel_window(int r, TBSPixel * TBSPixel, Pixel * pixels, int 
 
 	for(int i = x_top_left; i <= (x + r); i++) {
 	  for(int j = y_top_left; j <= (y + r); j++) {
-	    if (!(i <= 0 && i >= width) || !(j <= 0 && j >= height)) {
+	    if ((i <= 0 && i >= width) || (j <= 0 && j >= height)) {
 	      Pixel pixel_out_bounds = {0, 0, 0, 0};
 	      pixel_window[counter] = pixel_out_bounds;
 	      counter++;
 	    }
-	    int position = (width * j) + i;
-	    pixel_window[counter] = pixels[i];
-            counter++;
+	    else { 
+	      int position = (width * j) + i;
+	      printf("%d: %d %d\n", counter, i, j); 
+	      pixel_window[counter] = pixels[i];
+              counter++;
+	    }
 	  }
 	}
 	      
@@ -50,20 +53,24 @@ Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * 
 
 	int counter = 0;
 
-	int x_top_left = x - r;
-        int y_top_left = y - r;
+	int x_top_left = exemp_x - r;
+        int y_top_left = exemp_y - r;
 
         for(int i = x_top_left; i <= (exemp_x + r); i++) {
           for(int j = y_top_left; j <= (exemp_y + r); j++) {
-            if (!(i <= 0 && i >= width) || !(j <= 0 && j >= height)) {
+            if ((i <= 0 && i >= width) || (j <= 0 && j >= height)) {
               Pixel pixel_out_bounds = {0, 0, 0, 0};
               pixel_window[counter] = pixel_out_bounds;
                 counter++;
             }
+	    else {
             int position = (width * j) + i;
             pixel_window[counter] = pixels[i];
+	    printf("%d: %d %d\n", counter, i, j);
             counter++;
-          }
+	    }
+
+	    }
         }
 
         return pixel_window;
@@ -78,19 +85,19 @@ void compare_windows(TBSPixel * tbs_pixels, Image * img, Image * exemp, int r, i
   int height = img->height;
   int exemp_width = exemp->width;
   int exemp_height = exemp->height;
-  int exemp_count = 0;
-  int exemp_counter = 0;
+  int exemp_count = 0; //This is the index to help us traverse through the exemplar image using a 1-D for loop
+  int exemp_counter = 0; //Counts every exemplar pixel 
 
   
-  for (int i = 0; i < TBSPixel_arr_size; i++) {
-    Pixel * tbs_pixel_window = create_TBS_pixel_window(r, tbs_pixels[i], pixels_array, width, height);
-    for(int j = 0; j < width * height; j++) {
+  for (int i = 0; i < TBSPixel_arr_size; i++) { //For every TBS Pixel
+    Pixel * tbs_pixel_window = create_TBS_pixel_window(r, tbs_pixels[i], pixels_array, width, height); //We create a window
+    for(int j = 0; j < width * height; j++) { //We compare it to every exemplar pixel
       if(j >= (exemp_count*width) && j <= (exemp_count*width + exemp_width -1) && !(exemp_count >= exemp_height)) {
 	  exemp_counter++;
-          if (exemp_counter % width == 0) {
-             exemp_count++;
-          }
-	  Pixel * exemp_pixel_window = create_exemplar_window(r, j, width, pixels_array);
+	  Pixel * exemp_pixel_window = create_exemplar_window(r, j, width, height, pixels_array);
+          if (exemp_counter % exemp->width == 0) {
+	     exemp_count++; 
+	  }
 	  //TO DO - implement helper function to do comparison between corresponding pixels in both windows
       }
     }
@@ -447,13 +454,6 @@ Image *SynthesizeFromExemplar( const Image *exemplar , unsigned int outWidth , u
 	int exemplar_pixels = exemplar->width * exemplar->height;
 	int new_pixels = new_image->width * new_image->height;
 	unsigned int TBSPixel_arr_size = new_pixels - exemplar_pixels;
-
-	/*
-	for (int i = 0; i < (new_image->width - 2) + (new_image->height - 2); i++) {
-		int x = neighbor_counts[i].neighborCount;
-		printf("%d\n", x);
-	}
-	*/
 	
 	if (SortTBSPixels(neighbor_counts, TBSPixel_arr_size) == 0) {
 		printf("Success!\n");
@@ -462,19 +462,8 @@ Image *SynthesizeFromExemplar( const Image *exemplar , unsigned int outWidth , u
 		printf("Failure :(\n");
 	}
 
-	for (unsigned int i = 0; i <= ((exemplar->width) + (exemplar->height) + 1); i++) {
-		int nc = neighbor_counts[i].neighborCount;
-		int x = neighbor_counts[i].idx.x;
-		int y = neighbor_counts[i].idx.y;
-		printf("%d %d %d\n", nc, x, y);
-	}
-
-	/*
-	for (int i = 0; i < 10; i++) {
-		int x = neighbor_counts[i].neighborCount;
-		printf("%d\n", x);
-	}
-	*/
+	//Pixel * tbs_window = create_TBS_pixel_window(windowRadius, neighbor_counts[10], new_image->pixels, outWidth, outHeight);
+	Pixel * exemplar_window = create_exemplar_window(windowRadius, 275, outWidth, outHeight, new_image->pixels);                              
 
 	return new_image;
 }
