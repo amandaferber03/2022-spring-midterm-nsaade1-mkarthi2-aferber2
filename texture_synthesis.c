@@ -10,6 +10,7 @@
 #include "image.h"
 
 
+/* This function creates a pixel window for TBS Pixel evaluation */
 Pixel * create_TBS_pixel_window(int r, TBSPixel TBSPixel, Pixel * pixels, int width, int height) {
 	printf("create_TBS_pixel_window\n");
 	int window_width = 2 * r + 1;
