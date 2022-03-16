@@ -43,17 +43,18 @@ Pixel * create_TBS_pixel_window(int r, TBSPixel TBSPixel, Pixel * pixels, int wi
 }
 
 
+/*This function creates a window to evaluate the exemplar pixels*/
 Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * pixels) { //to be used in a for loop iterating through the exemplar image pixels
 	printf("create_exemplar_window\n");
-	int window_width = 2 * r + 1;
-    int window_height = 2 * r + 1;
+	int window_width = 2 * r + 1; //Calculating window width
+	int window_height = 2 * r + 1;//Calculating window height
 
     Pixel * pixel_window = (Pixel *) malloc(sizeof(Pixel) * window_width * window_height);
 
-	int exemp_x  = index  % width;
-    int exemp_y  = index / width;
+    int exemp_x  = index  % width; //Calculating x position
+    int exemp_y  = index / width; //Calculating y position
 
-	int counter = 0;
+    int counter = 0; //index within window
 
 	int x_top_left = exemp_x - r;
     int y_top_left = exemp_y - r;
@@ -67,19 +68,19 @@ Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * 
             	counter++;
             }
 	    	else {
-           	 	pixel_window[counter] = pixels[i];
-            	counter++;
+		  pixel_window[counter] = pixels[i];
+		  counter++; 
 	    	}
-
 	    }
     }
 
-    return pixel_window;
+    return pixel_window; //return generated window
 }
 
 
 double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int r) {
 	printf("find_difference\n");
+	//Initialization:
 	double diff = 0;
 	double d = 0;
 	double sigma = (2 * r + 1) / 6.4;
@@ -90,7 +91,7 @@ double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int
 
 	for (int i = -r; i <= r; i++) {
 		for (int j = -r; j <= r; j++) {
-
+		  
 			Pixel tbs_pixel = tbs_pixel_window[counter];
 			Pixel exemp_pixel = exemp_pixel_window[counter];
 
@@ -148,9 +149,11 @@ PixelDiff * compare_windows(Pixel * tbs_pixel_window, Image * img, const Image *
 	    
 		
     }
+    //Return an array with the calculated differences  
   return diff_array;
 }
 
+/**Function to find the minimum difference between unset and pixel from exemplar*/
 PixelDiff find_minimum_difference(PixelDiff * diff_array, int exemp_width, int exemp_height) {
 	printf("find_minimum_difference\n");
 	double min = diff_array[0].diff;
@@ -197,28 +200,37 @@ PixelDiff find_minimum_difference(PixelDiff * diff_array, int exemp_width, int e
 
 }
 
+/*Function for setting up TBS Pixels*/
 Image * set_TBS_Pixels(int TBSPixel_arr_size, TBSPixel * tbs_pixels, int r, Image * img, const Image * exemp){
 	printf("set_TBS_Pixels\n");
 	Pixel * pixels = img->pixels;
 	for (int i = 0; i < TBSPixel_arr_size; i++) {
+	        //Creating pertinent variables and initializing them
 		Pixel * tbs_pixel_window = create_TBS_pixel_window(r, tbs_pixels[i], pixels, img->width, img->height);
 		PixelDiff * pixel_diffs = compare_windows(tbs_pixel_window, img, exemp, r);
 		PixelDiff rand_exemp = find_minimum_difference(pixel_diffs, exemp->width, exemp->height);
 		Pixel for_tbs_pixel = rand_exemp.pixel;
+
+		//Calculating index for setting
 		int x = tbs_pixels[i].idx.x;
 		int y = tbs_pixels[i].idx.y;
-		int pos = (img->width * y) + x; 
+		int pos = (img->width * y) + x;
+
+		//Finally, we set up the pixels
 		pixels[pos].r = for_tbs_pixel.r;
 		pixels[pos].g = for_tbs_pixel.g;
 		pixels[pos].b = for_tbs_pixel.b;
 		pixels[pos].a = for_tbs_pixel.a;
 	}
+
+	//After exiting the loop, we return the generated image
 	return img;
 
 }
 
 	
 
+/*Function that counts the amount of set neighboring pixel for each new image pixel, and stores the amounts in arrays*/
 TBSPixel * count_neighbors(Image * new_img, const Image * exemplar) {
 	printf("count_neighbors\n");
 	// determining the size of the TBSPixel array
@@ -283,6 +295,7 @@ TBSPixel * count_neighbors(Image * new_img, const Image * exemplar) {
 	return tbs_pixels;
 }
 
+/*Helper function that determines the pixel position within the image*/
 int determine_position(unsigned int i, unsigned int width, unsigned int height) {
 	printf("determine_position\n");
 	if (i + width >= width * height) {
@@ -323,6 +336,8 @@ int determine_position(unsigned int i, unsigned int width, unsigned int height) 
 	}
 }
 
+
+/*Helper function that counts neighbors for top pixels*/
 void count_for_top(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	printf("count_for_top\n");
 	if (pixel[i - 1].a == 255) { // left pixel
@@ -342,6 +357,7 @@ void count_for_top(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, un
 	}
 }
 
+/*Helper function that counts neighbors for bottom pixels*/
 void count_for_bottom_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	printf("count_for_bottom\n");
 	if (pixel[i - width].a == 255) { // top pixel
@@ -355,6 +371,7 @@ void count_for_bottom_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tr
 	}
 }
 
+/*Helper function that counts neighbors for bottom left pixels*/
 void count_for_bottom_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	printf("count_for_bottom_left\n");
 	if (pixel[i - width].a == 255) { // top pixel
@@ -368,6 +385,7 @@ void count_for_bottom_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tra
 	}
 }
 
+/*Helper function that counts neighbors for bottom pixels*/
 void count_for_bottom(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	printf("count_for_bottom\n");
 	if (pixel[i - width].a == 255) { // top
@@ -387,6 +405,8 @@ void count_for_bottom(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker,
 	}
 }
 
+
+/*Helper function that counts neighbors for top right pixels*/
 void count_for_top_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	printf("count_for_top_right\n");
 	if (pixel[i - 1].a == 255) { // left pixel
@@ -400,6 +420,7 @@ void count_for_top_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_track
 	}
 }
 
+/*Helper function that counts neighbors for right pixels*/
 void count_for_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	printf("count_for_right\n");
 	if (pixel[i - width].a == 255) { // top pixel
@@ -419,6 +440,7 @@ void count_for_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, 
 	}
 }
 
+/*Helper function that counts neighbors for left pixels*/
 void count_for_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	printf("count_for_left\n");
 	if (pixel[i - width].a == 255) { // top pixel
@@ -438,6 +460,7 @@ void count_for_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, u
 	}
 }
 
+/*Helper function that counts neighbors for center pixels*/
 void count_for_other(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
 	printf("count_for_other\n");
 	if (pixel[i - width].a == 255) { // top pixel
