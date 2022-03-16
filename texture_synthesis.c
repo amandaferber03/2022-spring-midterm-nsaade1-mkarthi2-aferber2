@@ -5,9 +5,13 @@
 #include <math.h>
 #include <time.h>
 #include <assert.h>
+#include <float.h>
 #include "texture_synthesis.h"
+#include "image.h"
+
 
 Pixel * create_TBS_pixel_window(int r, TBSPixel TBSPixel, Pixel * pixels, int width, int height) {
+	printf("create_TBS_pixel_window\n");
 	int window_width = 2 * r + 1;
 	int window_height = 2 * r + 1;
 
@@ -28,10 +32,8 @@ Pixel * create_TBS_pixel_window(int r, TBSPixel TBSPixel, Pixel * pixels, int wi
 	      counter++;
 	    }
 	    else { 
-	      int position = (width * j) + i;
-	      printf("%d: %d %d\n", counter, i, j); 
 	      pixel_window[counter] = pixels[i];
-              counter++;
+          counter++;
 	    }
 	  }
 	}
@@ -42,43 +44,78 @@ Pixel * create_TBS_pixel_window(int r, TBSPixel TBSPixel, Pixel * pixels, int wi
 
 
 Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * pixels) { //to be used in a for loop iterating through the exemplar image pixels
-
+	printf("create_exemplar_window\n");
 	int window_width = 2 * r + 1;
-        int window_height = 2 * r + 1;
+    int window_height = 2 * r + 1;
 
-        Pixel * pixel_window = (Pixel *) malloc(sizeof(Pixel) * window_width * window_height);
+    Pixel * pixel_window = (Pixel *) malloc(sizeof(Pixel) * window_width * window_height);
 
 	int exemp_x  = index  % width;
-        int exemp_y  = index / width;
+    int exemp_y  = index / width;
 
 	int counter = 0;
 
 	int x_top_left = exemp_x - r;
-        int y_top_left = exemp_y - r;
+    int y_top_left = exemp_y - r;
 
-        for(int i = x_top_left; i <= (exemp_x + r); i++) {
-          for(int j = y_top_left; j <= (exemp_y + r); j++) {
+    for(int i = x_top_left; i <= (exemp_x + r); i++) {
+        for(int j = y_top_left; j <= (exemp_y + r); j++) {
             if ((i <= 0 && i >= width) || (j <= 0 && j >= height)) {
-              Pixel pixel_out_bounds = {0, 0, 0, 0};
-              pixel_window[counter] = pixel_out_bounds;
-                counter++;
+				// alpha = -1 to indicate that the pixel is out of bounds
+            	Pixel pixel_out_bounds = {0, 0, 0, 50}; 
+            	pixel_window[counter] = pixel_out_bounds;
+            	counter++;
             }
-	    else {
-            int position = (width * j) + i;
-            pixel_window[counter] = pixels[i];
-	    printf("%d: %d %d\n", counter, i, j);
-            counter++;
-	    }
+	    	else {
+           	 	pixel_window[counter] = pixels[i];
+            	counter++;
+	    	}
 
 	    }
-        }
+    }
 
-        return pixel_window;
+    return pixel_window;
+}
+
+
+double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int r) {
+	printf("find_difference\n");
+	double diff = 0;
+	double d = 0;
+	double sigma = (2 * r + 1) / 6.4;
+	double s = 0;
+
+
+	int counter = 0;
+
+	for (int i = -r; i <= r; i++) {
+		for (int j = -r; j <= r; j++) {
+
+			Pixel tbs_pixel = tbs_pixel_window[counter];
+			Pixel exemp_pixel = exemp_pixel_window[counter];
+
+			// checks if the tbs pixel and exemp pixel is set
+			if (tbs_pixel.a == 255 && exemp_pixel.a == 255) {
+				d = PixelSquaredDifference(tbs_pixel, exemp_pixel);
+				s = exp( -(i*i + j*j)/(2*sigma*sigma)); 
+				diff += d*s;
+			}
+			// the exemp pixel is out of bounds so we don't compare the tbs_pixel_window to exemp_pixel_window
+			else if (tbs_pixel.a == 255 && exemp_pixel.a == 50) {
+				return DBL_MAX;
+			}
+			counter++;
+
+		}
+	}
+	return diff;
+
 }
 	
 
 
-void compare_windows(TBSPixel * tbs_pixels, Image * img, Image * exemp, int r, int TBSPixel_arr_size) {
+PixelDiff * compare_windows(Pixel * tbs_pixel_window, Image * img, const Image * exemp, int r) {
+	printf("compare_windows\n");
   //what should compare_windows return
   Pixel * pixels_array = img->pixels;
   int width = img->width;
@@ -88,24 +125,102 @@ void compare_windows(TBSPixel * tbs_pixels, Image * img, Image * exemp, int r, i
   int exemp_count = 0; //This is the index to help us traverse through the exemplar image using a 1-D for loop
   int exemp_counter = 0; //Counts every exemplar pixel 
 
+  // difference between a TBS window and exemplar window
+  double diff_of_windows = 0;
+
+  // array of differences between TBS window and all exemplar windows
+  PixelDiff * diff_array = malloc(exemp->width * exemp->height);
+
   
-  for (int i = 0; i < TBSPixel_arr_size; i++) { //For every TBS Pixel
-    Pixel * tbs_pixel_window = create_TBS_pixel_window(r, tbs_pixels[i], pixels_array, width, height); //We create a window
+  //for (int i = 0; i < TBSPixel_arr_size; i++) { //For every TBS Pixel
+    //Pixel * tbs_pixel_window = create_TBS_pixel_window(r, tbs_pixels[i], pixels_array, width, height); //We create a window
     for(int j = 0; j < width * height; j++) { //We compare it to every exemplar pixel
-      if(j >= (exemp_count*width) && j <= (exemp_count*width + exemp_width -1) && !(exemp_count >= exemp_height)) {
-	  exemp_counter++;
-	  Pixel * exemp_pixel_window = create_exemplar_window(r, j, width, height, pixels_array);
-          if (exemp_counter % exemp->width == 0) {
-	     exemp_count++; 
-	  }
-	  //TO DO - implement helper function to do comparison between corresponding pixels in both windows
-      }
+    	if(j >= (exemp_count*width) && j <= (exemp_count*width + exemp_width -1) && !(exemp_count >= exemp_height)) {
+	    	exemp_counter++;
+	  	    Pixel * exemp_pixel_window = create_exemplar_window(r, j, width, height, pixels_array);
+			diff_of_windows = find_difference(tbs_pixel_window, exemp_pixel_window, r);
+			PixelDiff exemp = {pixels_array[j], diff_of_windows};
+			diff_array[j] = exemp;
+		}
+        if (exemp_counter % exemp->width == 0) {
+	    	exemp_count++; 
+	    }
+	    
+		
     }
-  }
+  return diff_array;
 }
 
-TBSPixel * count_neighbors(Image * new_img, const Image * exemplar) {
+PixelDiff find_minimum_difference(PixelDiff * diff_array, int exemp_width, int exemp_height) {
+	printf("find_minimum_difference\n");
+	double min = diff_array[0].diff;
+	int num_elements = exemp_width * exemp_height;
 
+	printf("before first loop\n");
+	for (int i = 1; i < num_elements; i++) {
+		if (diff_array[i].diff < min) {
+			min = diff_array[i].diff;
+		}
+	}
+
+	//printf("Min: %f\n", min);
+	double threshold = min * 1.1;
+
+	int capacity = 1;
+	PixelDiff * threshold_arr = malloc(sizeof(PixelDiff) * capacity);
+	int counter = 0;
+
+	printf("before second loop\n");
+	for (int i = 0; i < num_elements; i++) {
+		printf("before first if\n");
+		if (diff_array[i].diff < threshold) {
+			threshold_arr[counter].pixel = diff_array[i].pixel; 
+			threshold_arr[counter].diff = diff_array[i].diff;
+
+			counter++; 
+		}
+		printf("before second if\n");
+		if (counter == capacity && i != num_elements - 1) {
+			capacity++;
+			threshold_arr = realloc(threshold_arr, sizeof(double) * capacity);
+		}
+	}
+
+	printf("Min: %f\n", min);
+	printf("Diff of first: %f\n", diff_array[0].diff);
+	printf("Counter: %d\n", counter);
+	printf("before random\n");
+	int random_index = rand() % counter; // 0 to counter - 1
+	printf("%d\n", random_index);
+	printf("before return\n");
+	return threshold_arr[random_index];
+
+}
+
+Image * set_TBS_Pixels(int TBSPixel_arr_size, TBSPixel * tbs_pixels, int r, Image * img, const Image * exemp){
+	printf("set_TBS_Pixels\n");
+	Pixel * pixels = img->pixels;
+	for (int i = 0; i < TBSPixel_arr_size; i++) {
+		Pixel * tbs_pixel_window = create_TBS_pixel_window(r, tbs_pixels[i], pixels, img->width, img->height);
+		PixelDiff * pixel_diffs = compare_windows(tbs_pixel_window, img, exemp, r);
+		PixelDiff rand_exemp = find_minimum_difference(pixel_diffs, exemp->width, exemp->height);
+		Pixel for_tbs_pixel = rand_exemp.pixel;
+		int x = tbs_pixels[i].idx.x;
+		int y = tbs_pixels[i].idx.y;
+		int pos = (img->width * y) + x; 
+		pixels[pos].r = for_tbs_pixel.r;
+		pixels[pos].g = for_tbs_pixel.g;
+		pixels[pos].b = for_tbs_pixel.b;
+		pixels[pos].a = for_tbs_pixel.a;
+	}
+	return img;
+
+}
+
+	
+
+TBSPixel * count_neighbors(Image * new_img, const Image * exemplar) {
+	printf("count_neighbors\n");
 	// determining the size of the TBSPixel array
 	unsigned int total_exemplar_pixels = exemplar->width * exemplar->height;
 	unsigned int total_new_img_pixels = new_img->width * new_img->height;
@@ -169,6 +284,7 @@ TBSPixel * count_neighbors(Image * new_img, const Image * exemplar) {
 }
 
 int determine_position(unsigned int i, unsigned int width, unsigned int height) {
+	printf("determine_position\n");
 	if (i + width >= width * height) {
 		// bottom right
 		if (i + 1 == width * height) {
@@ -208,6 +324,7 @@ int determine_position(unsigned int i, unsigned int width, unsigned int height) 
 }
 
 void count_for_top(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
+	printf("count_for_top\n");
 	if (pixel[i - 1].a == 255) { // left pixel
 		(*tbs_neighbor_tracker)++;
 	}
@@ -226,6 +343,7 @@ void count_for_top(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, un
 }
 
 void count_for_bottom_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
+	printf("count_for_bottom\n");
 	if (pixel[i - width].a == 255) { // top pixel
 		(*tbs_neighbor_tracker)++;
 	}
@@ -238,6 +356,7 @@ void count_for_bottom_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tr
 }
 
 void count_for_bottom_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
+	printf("count_for_bottom_left\n");
 	if (pixel[i - width].a == 255) { // top pixel
 		(*tbs_neighbor_tracker)++;
 	}
@@ -250,6 +369,7 @@ void count_for_bottom_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tra
 }
 
 void count_for_bottom(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
+	printf("count_for_bottom\n");
 	if (pixel[i - width].a == 255) { // top
 		(*tbs_neighbor_tracker)++;
 	}
@@ -268,6 +388,7 @@ void count_for_bottom(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker,
 }
 
 void count_for_top_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
+	printf("count_for_top_right\n");
 	if (pixel[i - 1].a == 255) { // left pixel
 		(*tbs_neighbor_tracker)++;
 	}
@@ -280,6 +401,7 @@ void count_for_top_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_track
 }
 
 void count_for_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
+	printf("count_for_right\n");
 	if (pixel[i - width].a == 255) { // top pixel
 		(*tbs_neighbor_tracker)++;
 	}
@@ -298,6 +420,7 @@ void count_for_right(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, 
 }
 
 void count_for_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
+	printf("count_for_left\n");
 	if (pixel[i - width].a == 255) { // top pixel
 		(*tbs_neighbor_tracker)++;
 	}
@@ -316,6 +439,7 @@ void count_for_left(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, u
 }
 
 void count_for_other(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, unsigned int width) {
+	printf("count_for_other\n");
 	if (pixel[i - width].a == 255) { // top pixel
 		(*tbs_neighbor_tracker)++;
 	}
@@ -344,7 +468,7 @@ void count_for_other(unsigned int i, Pixel * pixel, int * tbs_neighbor_tracker, 
 
 
 Image * place_image(unsigned int width, unsigned int height, const Image * exemplar_image) {
-
+	printf("place_image\n");
 	// checking if the width and height of the new image are greater
 	// than the width and the height of the exemplar image
 	if ((width < exemplar_image->width) || (height < exemplar_image->height)) {
@@ -394,6 +518,7 @@ Image * place_image(unsigned int width, unsigned int height, const Image * exemp
 // compares tbs pixels 
 int CompareTBSPixels( const void *v1 , const void *v2 )
 {
+	printf("CompareTBSPixels\n");
 	const TBSPixel *tp1 = (const TBSPixel *)v1;
 	const TBSPixel *tp2 = (const TBSPixel *)v2;
 	int d = tp1->neighborCount - tp2->neighborCount;
@@ -408,6 +533,7 @@ int CompareTBSPixels( const void *v1 , const void *v2 )
 // sorts tbs pixels, returns zero if succeeded
 int SortTBSPixels( TBSPixel *tbsPixels , unsigned int sz )
 {
+	printf("SortTBSPixels\n");
 	unsigned int *permutation = (unsigned int*)malloc( sizeof(unsigned int)*sz );
 	if( !permutation )
 	{
@@ -436,6 +562,7 @@ int SortTBSPixels( TBSPixel *tbsPixels , unsigned int sz )
 
 Image *SynthesizeFromExemplar( const Image *exemplar , unsigned int outWidth , unsigned int outHeight , unsigned int windowRadius) // bool verbose 
 {
+	printf("SynthesizeFromExemplar\n");
 	Image * new_image = place_image(outWidth, outHeight, exemplar);
 	
 	if (new_image == NULL) {
@@ -455,15 +582,10 @@ Image *SynthesizeFromExemplar( const Image *exemplar , unsigned int outWidth , u
 	int new_pixels = new_image->width * new_image->height;
 	unsigned int TBSPixel_arr_size = new_pixels - exemplar_pixels;
 	
-	if (SortTBSPixels(neighbor_counts, TBSPixel_arr_size) == 0) {
-		printf("Success!\n");
-	}
-	else {
-		printf("Failure :(\n");
-	}
+	SortTBSPixels(neighbor_counts, TBSPixel_arr_size);
 
-	//Pixel * tbs_window = create_TBS_pixel_window(windowRadius, neighbor_counts[10], new_image->pixels, outWidth, outHeight);
-	Pixel * exemplar_window = create_exemplar_window(windowRadius, 275, outWidth, outHeight, new_image->pixels);                              
+	new_image = set_TBS_Pixels(TBSPixel_arr_size, neighbor_counts, windowRadius, new_image, exemplar); 
+
 
 	return new_image;
 }

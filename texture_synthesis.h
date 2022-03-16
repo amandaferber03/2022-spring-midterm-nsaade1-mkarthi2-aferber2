@@ -15,14 +15,24 @@ typedef struct
 	unsigned int r;
 } TBSPixel;
 
+/**This is a function that sets the TBS Pixels**/
+Image * set_TBS_Pixels(int TBSPixel_arr_size, TBSPixel * tbs_pixels, int r, Image * img, const Image * exemp);
+
+/**This is a function that finds the minimum difference in values for future pixel setting**/
+PixelDiff find_minimum_difference(PixelDiff * diff_array, int exemp_width, int exemp_height);
+
+/**This is a function that compares the two windows we generated**/
+PixelDiff * compare_windows(Pixel * tbs_pixel_window, Image * img, const Image * exemp, int r);
+
+/**This function finds the squared diffirence between the pixel values of the two windows**/
+double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int r);
+
 /**This is a function that creates a window for TBS Pixels**/
 Pixel * create_TBS_pixel_window(int r, TBSPixel TBSPixel, Pixel * pixels, int width, int height);
 
 /**This is a function that creates a window for Exemplar Pixels**/
 Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * pixels);
 
-/**This function compares windows from TBS Pixels and the exemplar**/
-void compare_windows(TBSPixel * tbs_pixels, Image * img, Image * exemp, int r, int TBSPixel_arr_size); 
 
 /**This is a function that determines the number of set neighbors for each unset pixels**/
 TBSPixel * count_neighbors(Image * new_image, const Image * exemplar_image);

@@ -9,7 +9,7 @@
 
 int main( int argc , char *argv[] )
 {
-	#if 1 
+
 	printf("first");
 	
 	// Check number of command line arguments
@@ -51,40 +51,37 @@ int main( int argc , char *argv[] )
 
 	// Setting the fields of the struct representing the new image
 	Image * new_image = NULL;
-	new_image = SynthesizeFromExemplar(img, width, height, window_radius);
-	
-	//if(!new_image) {
-	//printf("Error: dimensions of exemplar exceed those of new image");
-	//return 1;
-	//}
-	
-	//FILE *fp_write = fopen(argv[2], "w+");
 
-	//if (fp_write == NULL) {
-	//printf("Error: Unable to write file");
-	//return 4;
-	//}
-	printf("\nfifth\n");
-	
-	//int pixel_count = WritePPM(fp_write, new_image);
-	//printf("\nsixth\n");
-	#else
-	new_image = SynthesizeFromExemplar(img, width, height, window_radius);
-	//fclose(fp_write);
-
-	
-
-	// Get the time at the start of execution
+	 //Get the time at the start of execution
 	clock_t start_clock = clock();
 
 	// TODO: IMPLEMENT THIS FUNCTION
 
-	// Get the time at the end of the execution
+	new_image = SynthesizeFromExemplar(img, width, height, window_radius);
+
+		// Get the time at the end of the execution
 	clock_t clock_difference = clock() - start_clock;
+
+	if(!new_image) {
+		printf("Error: dimensions of exemplar exceed those of new image");
+		return 1;
+	}
 
 	// Convert the time difference into seconds and print
 	printf( "Synthesized texture in %.2f(s)\n" , (double)clock_difference/CLOCKS_PER_SEC );
-	#endif
+
+
+	FILE *fp_write = fopen(argv[2], "w+");
+
+	if (fp_write == NULL) {
+		printf("Error: Unable to write file");
+		return 4;
+	}
+
+	int pixel_count = WritePPM(fp_write, new_image);
+
+	fclose(fp_write);
+
 	return 0;
 }
 

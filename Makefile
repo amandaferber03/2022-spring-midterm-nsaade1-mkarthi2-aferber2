@@ -8,19 +8,19 @@ all: project image ppm texture_synthesis
 
 # Links together files needed to create project  executable
 project: project.o image.o ppm.o texture_synthesis.o
-	$(CC) -o project project.o image.o ppm.o texture_synthesis.o -lz
+	$(CC) -o project project.o image.o ppm.o texture_synthesis.o -lz -lm
 
 # Links together files needed to create ppm executable                    
 ppm: ppm.o project.o image.o texture_synthesis.o
-	$(CC) -o ppm ppm.o project.o image.o texture_synthesis.o -lz
+	$(CC) -o ppm ppm.o project.o image.o texture_synthesis.o -lz -lm
 
 # Links together files needed to create image executable
 image: image.o project.o ppm.o texture_synthesis.o
-	$(CC) -o image image.o project.o ppm.o texture_synthesis.o -lz
+	$(CC) -o image image.o project.o ppm.o texture_synthesis.o -lz -lm
                                                                              
 # Links together files needed to create texture_synthesis executable
 texture_synthesis: texture_synthesis.o image.o project.o ppm.o
-	$(CC) -o texture_synthesis texture_synthesis.o image.o project.o ppm.o -lz
+	$(CC) -o texture_synthesis texture_synthesis.o image.o project.o ppm.o -lz -lm
 
 # Creates object files                                                        
 project.o: project.c image.h ppm.h texture_synthesis.h 

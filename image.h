@@ -32,6 +32,13 @@ typedef struct
 	Pixel *pixels;
 } Image;
 
+typedef struct
+{
+	Pixel pixel;
+
+	double diff;
+} PixelDiff;
+
 /** A struct for indexing a pixel*/
 typedef struct
 {
@@ -43,7 +50,7 @@ typedef struct
 } PixelIndex;
 
 /** A function that returns the sum-of-squared differences of the pixels' red, green, and blue color values (the alpha values are not used)*/
-double PixelSquaredDifference( Pixel p1 , Pixel p2 );
+double PixelSquaredDifference(Pixel p1 , Pixel p2 );
 
 /** A function that checks that a pixel index is within the bounds of the image*/
 bool InBounds( const Image *image , PixelIndex idx );
