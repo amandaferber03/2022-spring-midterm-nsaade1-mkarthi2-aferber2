@@ -82,6 +82,7 @@ Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * 
 double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int r) {
 	printf("find_difference\n");
 	//Initialization:
+	printf("find_difference\n");
 	double diff = 0;
 	double d = 0;
 	double sigma = (2 * r + 1) / 6.4;
@@ -92,7 +93,7 @@ double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int
 
 	for (int i = -r; i <= r; i++) {
 		for (int j = -r; j <= r; j++) {
-		  
+		  printf("%d %d counter: %d\n", i, j, counter);
 			Pixel tbs_pixel = tbs_pixel_window[counter];
 			Pixel exemp_pixel = exemp_pixel_window[counter];
 
@@ -104,12 +105,20 @@ double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int
 			}
 			// the exemp pixel is out of bounds so we don't compare the tbs_pixel_window to exemp_pixel_window
 			else if (tbs_pixel.a == 255 && exemp_pixel.a == 50) {
-				return DBL_MAX;
+				return -1.0;
 			}
 			counter++;
 
 		}
 	}
+	printf("success!\n");
+	if(diff == 0) {
+	  for (int i = 0; i < 25; i++) {
+	    printf("TBS Pixel: %u %u %u %u\n", tbs_pixel_window[i].r, tbs_pixel_window[i].g, tbs_pixel_window[i].b, tbs_pixel_window[i].a);
+	    printf("Exemp Pixel: %u %u %u %u\n", exemp_pixel_window[i].r, exemp_pixel_window[i].g, exemp_pixel_window[i].b, exemp_pixel_window[i].a);
+	  }
+	}
+	assert(diff != 0);
 	return diff;
 
 }
@@ -117,76 +126,88 @@ double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int
 
 
 PixelDiff * compare_windows(Pixel * tbs_pixel_window, Image * img, const Image * exemp, int r) {
-	printf("compare_windows\n");
-  //what should compare_windows return
+//what should compare_windows return
   Pixel * pixels_array = img->pixels;
   int width = img->width;
   int height = img->height;
   int exemp_width = exemp->width;
   int exemp_height = exemp->height;
   int exemp_count = 0; //This is the index to help us traverse through the exemplar image using a 1-D for loop
-  int exemp_counter = 0; //Counts every exemplar pixel 
+  int exemp_counter = 0; //Counts every exemplar pixel
+  int diff_array_index = 0; // current index of diff_array
 
   // difference between a TBS window and exemplar window
   double diff_of_windows = 0;
 
   // array of differences between TBS window and all exemplar windows
-  PixelDiff * diff_array = malloc(exemp->width * exemp->height);
+  PixelDiff * diff_array = (PixelDiff *) malloc(sizeof(PixelDiff) * exemp->width * exemp->height);
 
   
   //for (int i = 0; i < TBSPixel_arr_size; i++) { //For every TBS Pixel
     //Pixel * tbs_pixel_window = create_TBS_pixel_window(r, tbs_pixels[i], pixels_array, width, height); //We create a window
-    for(int j = 0; j < width * height; j++) { //We compare it to every exemplar pixel
-    	if(j >= (exemp_count*width) && j <= (exemp_count*width + exemp_width -1) && !(exemp_count >= exemp_height)) {
-	    	exemp_counter++;
-	  	    Pixel * exemp_pixel_window = create_exemplar_window(r, j, width, height, pixels_array);
-			diff_of_windows = find_difference(tbs_pixel_window, exemp_pixel_window, r);
-			PixelDiff exemp = {pixels_array[j], diff_of_windows};
-			diff_array[j] = exemp;
-		}
-        if (exemp_counter % exemp->width == 0) {
-	    	exemp_count++; 
-	    }
-	    
-		
+  //for(int j = 0; j < width * height; j++) { //We compare it to every exemplar pixel
+    //if(j >= (exemp_count*width) && j <= (exemp_count*width + exemp_width -1) && !(exemp_count >= exemp_height)) {
+      //exemp_counter++;
+      //Pixel * exemp_pixel_window = create_exemplar_window(r, j, width, height, pixels_array);
+      //diff_of_windows = find_difference(tbs_pixel_window, exemp_pixel_window, r);
+      //PixelDiff exemp = {pixels_array[j], diff_of_windows};
+      //diff_array[j] = exemp;
+      //}
+    // }
+
+  for(int i = 0; i < width; i++) {
+    for(int j = 0; j < height; j++) {
+      int pos = (width * j) + i; 
+      if(pos >= (j*width) && pos <= (j*width + exemp_width -1) && !(j >= exemp_height)) {
+	Pixel * exemp_pixel_window = create_exemplar_window(r, pos, width, height, pixels_array);
+	diff_of_windows = find_difference(tbs_pixel_window, exemp_pixel_window, r);
+	PixelDiff exemp = {pixels_array[pos], diff_of_windows};
+	diff_array[diff_array_index] = exemp;
+	diff_array_index++;
+	exemp_counter++;
+      }
     }
-    //Return an array with the calculated differences  
-  return diff_array;
+  }
+    printf("Exemp counter: %d\n", exemp_counter);
+    return diff_array;
 }
 
 /**Function to find the minimum difference between unset and pixel from exemplar*/
 PixelDiff find_minimum_difference(PixelDiff * diff_array, int exemp_width, int exemp_height) {
-	printf("find_minimum_difference\n");
+	printf("find min dif");
 	double min = diff_array[0].diff;
 	int num_elements = exemp_width * exemp_height;
 
-	printf("before first loop\n");
-	for (int i = 1; i < num_elements; i++) {
+	//printf("before first loop\n");
+	for (int i = 1; i < num_elements; i++) {//CHANGE THIS
 		if (diff_array[i].diff < min) {
+		  if(diff_array[i].diff >= 0) {
 			min = diff_array[i].diff;
+		  }
 		}
 	}
-
+        //printf("before thresh\n");
 	//printf("Min: %f\n", min);
 	double threshold = min * 1.1;
-
+        //printf("before cap\n");
 	int capacity = 1;
+	//printf("before thresh_arr malloc\n");
 	PixelDiff * threshold_arr = malloc(sizeof(PixelDiff) * capacity);
 	int counter = 0;
 
-	printf("before second loop\n");
+	//printf("before second loop\n");
 	for (int i = 0; i < num_elements; i++) {
-		printf("before first if\n");
+	  //printf("before first if\n");
 		if (diff_array[i].diff < threshold) {
 			threshold_arr[counter].pixel = diff_array[i].pixel; 
 			threshold_arr[counter].diff = diff_array[i].diff;
 
 			counter++; 
 		}
-		printf("before second if\n");
+		//printf("before second if\n");
 		if (counter == capacity && i != num_elements - 1) {
 			capacity++;
-			threshold_arr = realloc(threshold_arr, sizeof(double) * capacity);
+			threshold_arr = realloc(threshold_arr, sizeof(PixelDiff) * capacity);
 		}
 	}
 
