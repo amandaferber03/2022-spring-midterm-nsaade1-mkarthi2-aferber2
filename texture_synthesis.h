@@ -16,29 +16,30 @@ typedef struct
 } TBSPixel;
 
 /**This is a function that sets the TBS Pixels**/
-Image * set_TBS_Pixels(int TBSPixel_arr_size, TBSPixel * tbs_pixels, int r, Image * img, const Image * exemp);
+
+Image * set_TBS_Pixels(int TBSPixel_arr_size, TBSPixel * tbs_pixels, int r, Image * img, Image * exemp);
 
 /**This is a function that finds the minimum difference in values for future pixel setting**/
 PixelDiff find_minimum_difference(PixelDiff * diff_array, int exemp_width, int exemp_height);
 
 /**This is a function that compares the two windows we generated**/
-PixelDiff * compare_windows(Pixel * tbs_pixel_window, Image * img, const Image * exemp, int r);
+PixelDiff * compare_windows(Pixel * tbs_pixel_window, Image * img,  Image * exemp, int r);
 
 /**This function finds the squared diffirence between the pixel values of the two windows**/
-double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int r);
+double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int r, Pixel * pixels, int pos);
 
 /**This is a function that creates a window for TBS Pixels**/
 Pixel * create_TBS_pixel_window(int r, TBSPixel TBSPixel, Pixel * pixels, int width, int height);
 
 /**This is a function that creates a window for Exemplar Pixels**/
-Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * pixels);
+Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * pixels,  Image * exemplar);
 
 
 /**This is a function that determines the number of set neighbors for each unset pixels**/
-TBSPixel * count_neighbors(Image * new_image, const Image * exemplar_image);
+TBSPixel * count_neighbors(Image * new_image,  Image * exemplar_image, int * num_neighbor_counts);
 
 /**This is a function that copies the examplar image and places it in top-left corner of a new image with dimensions that the user specifies */
-Image * place_image(unsigned int width, unsigned int height, const Image * image);
+Image * place_image(unsigned int width, unsigned int height,  Image * image);
 
 /** A function that compares two TBSPixels and returns a negative number if the first should come earlier in the sort order and a positive number if it should come later*/
 int CompareTBSPixels( const void *v1 , const void *v2 );
@@ -47,7 +48,7 @@ int CompareTBSPixels( const void *v1 , const void *v2 );
 int SortTBSPixels( TBSPixel *tbsPixels , unsigned int sz );
 
 /** A function that extends the exemplar into an image with the specified dimensions, using the prescribed window radius -- the verbose argument is passed in to enable logging to the command prompt, if desired*/
-Image *SynthesizeFromExemplar( const Image *exemplar , unsigned int outWidth , unsigned int outHeight , unsigned int windowRadius); // bool verbose );
+Image *SynthesizeFromExemplar(  Image *exemplar , unsigned int outWidth , unsigned int outHeight , unsigned int windowRadius); // bool verbose );
 
 /** Counter functions for different pixels **/
 int determine_position(unsigned int i, unsigned int width, unsigned int height);

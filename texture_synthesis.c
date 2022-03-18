@@ -139,6 +139,7 @@ double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int
 	double d = 0;
 	double sigma = (2 * r + 1) / 6.4;
 	double s = 0;
+	int diff_counter = 0;
 
 
 	int counter = 0;
@@ -154,6 +155,7 @@ double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int
 			        d = PixelSquaredDifference(tbs_pixel, exemp_pixel);
 				s = exp( -(i*i + j*j)/(2*sigma*sigma)); 
 				diff += d*s;
+				diff_counter++;
 				if(pixels[index].r == 255 && d != 0) {
 				  //printf("index of faulty pixel: %d\n", index);
 				}
@@ -161,7 +163,7 @@ double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int
 		       
 
 			else if(exemp_pixel.a != 255) {
-			  return -1;
+			  return DBL_MAX;
 			}
 			counter++;
 
@@ -170,7 +172,10 @@ double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int
 	//if (pixels[index].r == 255) {
 	//printf("white center diff: %f\n", diff);
 	//}
-	return diff; 
+	if(diff_counter == 0) {
+		return DBL_MAX;
+	}
+	return diff/diff_counter; 
 }
 	
 
@@ -212,19 +217,19 @@ PixelDiff * compare_windows(Pixel * tbs_pixel_window, Image * img, Image * exemp
 }
 
 PixelDiff find_minimum_difference(PixelDiff * diff_array, int exemp_width, int exemp_height) {
-  int x = 0;
-  while(diff_array[x].diff < 0) {
-  x++;
-  }
-	double min = diff_array[x].diff;
+  //int x = 0;
+  //while(diff_array[x].diff < 0) {
+  //x++;
+  //}
+	double min = diff_array[0].diff;
 	int num_elements = exemp_width * exemp_height;
 
 	//printf("before first loop\n");
 	for (int i = 0; i < num_elements; i++) {
-		if (diff_array[i].diff < min) {
-		  if(diff_array[i].diff >= 0) {
+		if (diff_array[i].diff <= min) {
+		  //if(diff_array[i].diff >= 0) {
 			min = diff_array[i].diff;
-		  }
+		  //}
 		}
 		//printf("diff: %f", diff_array[i].diff);
 	}

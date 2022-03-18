@@ -79,6 +79,7 @@ int main( int argc , char *argv[] )
 	}
 
 	int pixel_count = WritePPM(fp_write, new_image);
+	FreeImage(&new_image);
 
 	fclose(fp_write);
 
