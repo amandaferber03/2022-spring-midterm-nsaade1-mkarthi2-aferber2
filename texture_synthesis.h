@@ -26,17 +26,17 @@ PixelDiff find_minimum_difference(PixelDiff * diff_array, int exemp_width, int e
 PixelDiff * compare_windows(Pixel * tbs_pixel_window, Image * img,  Image * exemp, int r);
 
 /**This function finds the squared diffirence between the pixel values of the two windows**/
-double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int r, Pixel * pixels, int pos);
+double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int r);
 
 /**This is a function that creates a window for TBS Pixels**/
 Pixel * create_TBS_pixel_window(int r, TBSPixel TBSPixel, Pixel * pixels, int width, int height);
 
 /**This is a function that creates a window for Exemplar Pixels**/
-Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * pixels,  Image * exemplar);
+Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * pixels);
 
 
 /**This is a function that determines the number of set neighbors for each unset pixels**/
-TBSPixel * count_neighbors(Image * new_image,  Image * exemplar_image, int * num_neighbor_counts);
+TBSPixel * count_neighbors(Image * new_image, int * num_neighbor_counts);
 
 /**This is a function that copies the examplar image and places it in top-left corner of a new image with dimensions that the user specifies */
 Image * place_image(unsigned int width, unsigned int height,  Image * image);

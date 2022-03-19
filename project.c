@@ -9,21 +9,16 @@
 
 int main( int argc , char *argv[] )
 {
-
-	printf("first");
-	
 	// Check number of command line arguments
 	if (argc != 6) {
 		printf("Error: Not enough arguments provided\n");
 		return 1;
 	}
-	printf("second\n");
 	
 	// Seed the random number generator so that the code produces the same results on the same input.
 	srand(0);
     FILE *fp = fopen(argv[1], "r");
 
-	// Error reading the input file
 	if (fp == NULL) {
 	  printf("Error: Unable to read file of the exemplar image\n");
 	  return 2;
@@ -41,13 +36,11 @@ int main( int argc , char *argv[] )
 
 	// Closing the input file
 	fclose(fp);
-	printf("third\n");
 	
 	// Storing the user inputted width, height, and window radius
 	int width = atoi(argv[3]);
 	int height = atoi(argv[4]);
 	int window_radius = atoi(argv[5]);
-	printf("main width and height: %d %d", width, height);
 
 	// Setting the fields of the struct representing the new image
 	Image * new_image = NULL;
@@ -78,7 +71,9 @@ int main( int argc , char *argv[] )
 		return 4;
 	}
 
-	int pixel_count = WritePPM(fp_write, new_image);
+	if ((unsigned int)WritePPM(fp_write, new_image) != (new_image->width * new_image->height)) {
+	    printf("Error: new image size does not match dimensions given by user");
+	  }
 	FreeImage(&new_image);
 
 	fclose(fp_write);
