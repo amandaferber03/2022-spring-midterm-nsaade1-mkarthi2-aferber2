@@ -9,7 +9,18 @@
 #include "texture_synthesis.h"
 #include "image.h"
 
-    
+double * compute_gaussian(int r) {
+  double * gaussian = (double *) malloc(sizeof(double) * (2*r +1) * (2*r+1));
+  double sigma = (2*r+1)/6.4;
+  int counter = 0;
+  for (int i = -r; i <= r; i++) {
+    for (int j = -r; j <= r; j++) {
+      gaussian[counter] = exp( -(i*i + j*j)/(2*sigma*sigma));
+      counter++;
+    }
+  }
+  return gaussian;
+}
  
 Pixel * create_TBS_pixel_window(int r, TBSPixel TBSPixel, Pixel * pixels, int width, int height) {
 	
@@ -110,11 +121,10 @@ Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * 
     return pixel_window;
 }
 
-double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int r) {
+double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int r, double * gaussian) {
 
 	double diff = 0;
 	double d = 0;
-	double sigma = (2 * r + 1) / 6.4;
 	double s = 0;
 	int diff_counter = 0;
 
@@ -129,7 +139,7 @@ double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int
 			// checks if the tbs pixel and exemp pixel is set
 			if (tbs_pixel.a == 255 && exemp_pixel.a == 255) {
 			        d = PixelSquaredDifference(tbs_pixel, exemp_pixel);
-				s = exp( -(i*i + j*j)/(2*sigma*sigma)); 
+				s = gaussian[counter]; 
 				diff += d*s;
 				diff_counter++;
 				}
@@ -150,7 +160,7 @@ double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int
 	
 
 
-PixelDiff * compare_windows(Pixel * tbs_pixel_window, Image * img, Image * exemp, int r) {
+PixelDiff * compare_windows(Pixel * tbs_pixel_window, Image * img, Image * exemp, int r, double * gaussian) {
 	
   Pixel * pixels_array = img->pixels;
   int width = img->width;
@@ -171,7 +181,7 @@ PixelDiff * compare_windows(Pixel * tbs_pixel_window, Image * img, Image * exemp
       int pos = (width * j) + i; 
       if(pos >= (j*width) && pos <= (j*width + exemp_width -1) && !(j >= exemp_height)) {
 	exemp_pixel_window = create_exemplar_window(r, pos, width, height, pixels_array);
-	diff_of_windows = find_difference(tbs_pixel_window, exemp_pixel_window, r);
+	diff_of_windows = find_difference(tbs_pixel_window, exemp_pixel_window, r, gaussian);
 	PixelDiff exemp_pixel_diff = {pixels_array[pos], diff_of_windows};
 	diff_array[diff_array_index] = exemp_pixel_diff;
 	diff_array_index++;
@@ -224,11 +234,11 @@ PixelDiff find_minimum_difference(PixelDiff * diff_array, int exemp_width, int e
 
 }
 
-Image * set_TBS_Pixels(int TBSPixel_arr_size, TBSPixel * tbs_pixels, int r, Image * img, Image * exemp){
+Image * set_TBS_Pixels(int TBSPixel_arr_size, TBSPixel * tbs_pixels, int r, Image * img, Image * exemp, double * gaussian){
 	Pixel * pixels = img->pixels;
 		for (int i = 0; i < TBSPixel_arr_size; i++) {
 		Pixel * tbs_pixel_window = create_TBS_pixel_window(r, tbs_pixels[i], pixels, img->width, img->height);
-		PixelDiff * pixel_diffs = compare_windows(tbs_pixel_window, img, exemp, r);
+		PixelDiff * pixel_diffs = compare_windows(tbs_pixel_window, img, exemp, r, gaussian);
 		PixelDiff rand_exemp = find_minimum_difference(pixel_diffs, exemp->width, exemp->height);
 		Pixel for_tbs_pixel = rand_exemp.pixel;
 		int x = tbs_pixels[i].idx.x;
@@ -602,14 +612,16 @@ Image *SynthesizeFromExemplar(Image *exemplar , unsigned int outWidth , unsigned
 	
 	int num_neighbor_counts = 0;
 	TBSPixel * tbs_pixels  = count_neighbors(new_image, &num_neighbor_counts);
+	double * gaussian = compute_gaussian(windowRadius);
 	
 	while (num_neighbor_counts > 0) { //while there are still unset pixels
 	  SortTBSPixels(tbs_pixels, num_neighbor_counts);
-	  new_image = set_TBS_Pixels(num_neighbor_counts, tbs_pixels, windowRadius, new_image, exemplar);
+	  new_image = set_TBS_Pixels(num_neighbor_counts, tbs_pixels, windowRadius, new_image, exemplar, gaussian);
 	  free(tbs_pixels);
 	  tbs_pixels  = count_neighbors(new_image, &num_neighbor_counts);
 	}
         free(tbs_pixels);
+	free(gaussian);
 	FreeImage(&exemplar);
 	
 

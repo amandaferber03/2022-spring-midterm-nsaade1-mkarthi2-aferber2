@@ -15,18 +15,20 @@ typedef struct
 	unsigned int r;
 } TBSPixel;
 
+double * compute_gaussian(int r);
+
 /**This is a function that sets the TBS Pixels**/
 
-Image * set_TBS_Pixels(int TBSPixel_arr_size, TBSPixel * tbs_pixels, int r, Image * img, Image * exemp);
+Image * set_TBS_Pixels(int TBSPixel_arr_size, TBSPixel * tbs_pixels, int r, Image * img, Image * exemp, double * gaussian);
 
 /**This is a function that finds the minimum difference in values for future pixel setting**/
 PixelDiff find_minimum_difference(PixelDiff * diff_array, int exemp_width, int exemp_height);
 
 /**This is a function that compares the two windows we generated**/
-PixelDiff * compare_windows(Pixel * tbs_pixel_window, Image * img,  Image * exemp, int r);
+PixelDiff * compare_windows(Pixel * tbs_pixel_window, Image * img,  Image * exemp, int r, double * gaussian);
 
 /**This function finds the squared diffirence between the pixel values of the two windows**/
-double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int r);
+double find_difference(Pixel * tbs_pixel_window, Pixel * exemp_pixel_window, int r, double * gaussian);
 
 /**This is a function that creates a window for TBS Pixels**/
 Pixel * create_TBS_pixel_window(int r, TBSPixel TBSPixel, Pixel * pixels, int width, int height);
