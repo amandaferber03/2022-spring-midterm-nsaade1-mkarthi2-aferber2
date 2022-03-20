@@ -127,46 +127,47 @@ Image *ReadPPM( FILE *fp )
 		img->pixels[i].a = 255;
 	}
 
-	//return the image struct pointer
+	// Return the image struct pointer
 	return img;
 }
 
 char r = 'r'; 
 
-/* Write given image to disk as a PPM.
-* Return -1 if any failure occurs, otherwise return the number of pixels written.
+/* 
+* Writes the given image to a disk as PPM file
+* Returns -1 if any failure occurs, otherwise returns the number of pixel written
 */
 int WritePPM( FILE *fp , const Image *img )
 {
+	// Confirm that we received a good file handle
+	assert(fp != NULL);
 
-  if (fp == NULL) {
-    printf("Error: Unable to open file");
-    return -1;
-  }
-
-  const char  PPM_identifier[] = "P6";
-  const char newline = '\n';
-  const char whitespace = ' ';
-  const unsigned int width = img->width;
-  //printf("Width: %u\n", width);
-  const unsigned int height = img->height;
-  //printf("Height: %u\n", height);
-  const unsigned int colors = 255;
-  int pixel_count = 0;
+	// Variables holding soon-to-be contents of file
+	const char  PPM_identifier[] = "P6";
+	const char newline = '\n';
+	const char whitespace = ' ';
+	const unsigned int width = img->width;
+	const unsigned int height = img->height;
+	const unsigned int colors = 255;
+	int pixel_count = 0;
   
-  fprintf(fp, "%s\n", PPM_identifier);
-  fprintf(fp, "%u %u\n%u\n", width, height, colors);
+	// Printing the PPM identifier (P6), width, height, and max colors into the file
+	fprintf(fp, "%s\n", PPM_identifier);
+	fprintf(fp, "%u %u\n%u\n", width, height, colors);
 
-  for(int i = 0; i < (width * height); i++) {
-    Pixel * pixels = img->pixels;//assigning to an array of Pixel structs img->pixels
-    unsigned char red = (pixels[i]).r;
-    unsigned char  green = (pixels[i]).g;
-    unsigned char blue = (pixels[i]).b;
-    //printf("%u %u %u/n", red, green, blue);
-    pixel_count++;
-    unsigned char tmp[3]= {red, green, blue};
-    fwrite(tmp, sizeof(tmp[0]), 3, fp);
-  }
+	// Printing the r, g, and b values into the file 
+	for(int i = 0; i < (width * height); i++) {
+
+		// Assigning pixels to an array of Pixel structs (an Image field)
+		Pixel * pixels = img->pixels; 
+		unsigned char red = (pixels[i]).r;
+    	unsigned char green = (pixels[i]).g;
+    	unsigned char blue = (pixels[i]).b;
+    	pixel_count++;
+    	unsigned char tmp[3]= {red, green, blue};
+    	fwrite(tmp, sizeof(tmp[0]), 3, fp);
+
+	}
  
-  return pixel_count;
+	return pixel_count;
 }

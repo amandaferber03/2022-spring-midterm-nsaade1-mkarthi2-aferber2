@@ -37,19 +37,21 @@ const Pixel *GetConstPixel( const Image *image , PixelIndex idx )
 	return image->pixels + idx.y*image->width + idx.x;
 }
 
+// Allocates memory for an Image struct
 Image *AllocateImage( unsigned int width , unsigned int height )
 {
-  Image *img = (Image*)malloc((sizeof(Image)));
-  img->width = width;
-  img->height = height;
-  img->pixels = malloc(width * height * sizeof(Pixel));
+	Image *img = (Image*)malloc((sizeof(Image)));
+	img->width = width;
+	img->height = height;
+	img->pixels = malloc(width * height * sizeof(Pixel));
   
-  return img;
+	return img;
 }
 
+// Frees memory taken up by an Image struct
 void FreeImage( Image **image )
 {
-  free((*image)->pixels);
-  free(*image);
-  *image = NULL;
+	free((*image)->pixels);
+	free(*image);
+	*image = NULL;
 }
