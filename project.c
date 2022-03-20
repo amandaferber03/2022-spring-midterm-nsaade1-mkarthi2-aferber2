@@ -81,11 +81,6 @@ int main( int argc , char *argv[] )
 		FreeImage(&new_image);
 		return 4;
 	}
-	else if (WritePPM(fp_write, new_image) == -1) {
-		fprintf(stderr, "Error: Unable to successfully open file\n");
-		FreeImage(&new_image);
-		return 4;
-	}
 
 	FreeImage(&new_image);
 	fclose(fp_write);

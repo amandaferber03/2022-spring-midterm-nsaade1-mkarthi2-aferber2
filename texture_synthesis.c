@@ -50,7 +50,7 @@ Pixel * create_TBS_pixel_window(int r, TBSPixel TBSPixel, Pixel * pixels, int wi
 		fprintf(stderr, "Error: Unable to allocate memory for window centered at TBS pixel\n");
 		return NULL;
 	}
-
+	
 	int x = TBSPixel.idx.x;
 	int y = TBSPixel.idx.y;
 
@@ -115,7 +115,7 @@ Pixel * create_exemplar_window(int r, int index, int width, int height, Pixel * 
 		fprintf(stderr, "Error: Unable to allocate memory for window centered at exemplar pixel\n");
 		return NULL;
 	}
-
+	
     int exemp_x  = index % width;
     int exemp_y  = index / width;
 
@@ -352,7 +352,7 @@ TBSPixel * count_neighbors(Image * new_img,  int * num_neighbor_counts) {
 		fprintf(stderr, "Error: Unable to allocate memory for array of TBS pixels\n");
 		return NULL;
 	}
-
+	
 	// other important variables
 	int TBSPixel_index = 0;
 	int pixel_col = 0;
@@ -646,17 +646,17 @@ Image * place_image(unsigned int width, unsigned int height, Image * exemplar_im
 		fprintf(stderr, "Error: Unable to allocate memory for new image\n");
 		return NULL;
 	}
-
+	
 	new_img->width = width;
 	new_img->height = height;
 	new_img->pixels = (Pixel *) malloc(sizeof(Pixel) * width * height);
 
-	if (new_img -> pixels == NULL) {
+	if (new_img->pixels == NULL) {
 		fprintf(stderr, "Error: Unable to allocate memory for pixels of new image\n");
 		FreeImage(&new_img);
 		return NULL;
 	}
-
+	
 	// creating pointers to Pixel arrays of the new image and exemplar image
 	Pixel * new_pixels = new_img->pixels;
 	Pixel * exemplar_pixels = exemplar_image->pixels;
@@ -746,7 +746,7 @@ Image *SynthesizeFromExemplar(Image *exemplar , unsigned int outWidth , unsigned
 	Image * new_image = place_image(outWidth, outHeight, exemplar);
 	
 	if (new_image == NULL) {
-		fprintf(stderr, "Error: Unable set exemplar pixels in new image\n");
+		fprintf(stderr, "Error: Unable to set exemplar pixels in new image\n");
 		return NULL;
 	}
 	

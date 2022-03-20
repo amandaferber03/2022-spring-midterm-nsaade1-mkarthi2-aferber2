@@ -135,17 +135,14 @@ char r = 'r';
 
 /* 
 * Writes the given image to a disk as PPM file
-* Returns -1 if any failure occurs, otherwise returns the number of pixel written
 */
 int WritePPM( FILE *fp , const Image *img )
 {
 	// Confirm that we received a good file handle
-	assert(fp != NULL);
+	// assert(fp != NULL);
 
 	// Variables holding soon-to-be contents of file
 	const char  PPM_identifier[] = "P6";
-	const char newline = '\n';
-	const char whitespace = ' ';
 	const unsigned int width = img->width;
 	const unsigned int height = img->height;
 	const unsigned int colors = 255;
